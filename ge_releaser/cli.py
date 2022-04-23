@@ -7,6 +7,7 @@ import github
 from github.Repository import Repository
 
 from ge_releaser.constants import GITHUB_REPO, all_constants_are_valid
+from ge_releaser.cut import cut
 from ge_releaser.prep import prep
 
 
@@ -16,15 +17,7 @@ def cli(ctx: click.Context) -> None:
     """
     A set of utilities to aid with the Great Expectations release process!
 
-    These are meant to be run sequentially:
-
-        1) prep: Prepare changelog/release version.
-
-        2) cut: Trigger the build process to automate publishing to PyPI.
-
-        3) tag: Tag the new release.
-
-        4) release: Create a new release entry in our GitHub page.
+    These are meant to be run sequentially: prep | cut | tag | release
 
     Please run `<command> help` for more specific details.
     """
@@ -44,7 +37,7 @@ def cli(ctx: click.Context) -> None:
 
 @cli.command(
     name="prep",
-    help="",
+    help="Prepare changelog/release version PR"
 )
 @click.argument("version_number", type=str, nargs=1)
 @click.pass_obj
@@ -54,19 +47,16 @@ def prep_cmd(repos: Tuple[git.Repo, Repository], version_number: str) -> None:
 
 @cli.command(
     name="cut",
-    help="",
+    help="Trigger the build process to automate publishing to PyPI"
 )
 @click.pass_obj
 def cut_cmd(repos: Tuple[git.Repo, Repository]) -> None:
-    # get fetch --all; git checkout main; git pull
-    # git merge origin/develop; git push
-    # Send user PyPi link and CI/CD link
-    pass
+    cut(repos[0])
 
 
 @cli.command(
     name="tag",
-    help="",
+    help="Tag the new release"
 )
 @click.pass_obj
 def tag_cmd(repos: Tuple[git.Repo, Repository]) -> None:
@@ -78,7 +68,7 @@ def tag_cmd(repos: Tuple[git.Repo, Repository]) -> None:
 
 @cli.command(
     name="release",
-    help="",
+    help="Create a new release entry in our GitHub page"
 )
 @click.pass_obj
 def release_cmd(repos: Tuple[git.Repo, Repository]) -> None:

@@ -287,6 +287,7 @@ def prep(
     click.secho(" * Opened prep PR (5/5)", fg="yellow")
 
     click.secho(
-        f"\n[SUCCESS] Please review, approve, and merge PR before continuing to `cut` command: {url}",
+        f"\n[SUCCESS] Please review, approve, and merge PR before continuing to `cut` command",
         fg="green",
     )
+    click.echo(f"Link to PR: {url}")
