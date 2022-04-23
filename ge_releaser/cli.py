@@ -3,8 +3,8 @@ from typing import Optional
 
 import click
 
-from ge_releaser.env import Environment
 from ge_releaser.cut import cut
+from ge_releaser.env import Environment
 from ge_releaser.prep import prep
 from ge_releaser.release import release
 from ge_releaser.tag import tag
