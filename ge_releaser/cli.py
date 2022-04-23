@@ -9,6 +9,8 @@ from github.Repository import Repository
 from ge_releaser.constants import GITHUB_REPO, all_constants_are_valid
 from ge_releaser.cut import cut
 from ge_releaser.prep import prep
+from ge_releaser.release import release
+from ge_releaser.tag import tag
 
 
 @click.group()
@@ -35,10 +37,7 @@ def cli(ctx: click.Context) -> None:
     ctx.obj = (git_repo, github_repo)
 
 
-@cli.command(
-    name="prep",
-    help="Prepare changelog/release version PR"
-)
+@cli.command(name="prep", help="Prepare changelog/release version PR")
 @click.argument("version_number", type=str, nargs=1)
 @click.pass_obj
 def prep_cmd(repos: Tuple[git.Repo, Repository], version_number: str) -> None:
@@ -46,34 +45,23 @@ def prep_cmd(repos: Tuple[git.Repo, Repository], version_number: str) -> None:
 
 
 @cli.command(
-    name="cut",
-    help="Trigger the build process to automate publishing to PyPI"
+    name="cut", help="Trigger the build process to automate publishing to PyPI"
 )
 @click.pass_obj
 def cut_cmd(repos: Tuple[git.Repo, Repository]) -> None:
     cut(repos[0])
 
 
-@cli.command(
-    name="tag",
-    help="Tag the new release"
-)
+@cli.command(name="tag", help="Tag the new release")
 @click.pass_obj
 def tag_cmd(repos: Tuple[git.Repo, Repository]) -> None:
-    # git tag -a <<VERSION>> -m "<<VERSION>>"
-    # git push origin <<VERSION>>
-    # git checkout develop; git pull; git merge main
-    pass
+    tag(repos[0])
 
 
-@cli.command(
-    name="release",
-    help="Create a new release entry in our GitHub page"
-)
+@cli.command(name="release", help="Create a new release entry in our GitHub page")
 @click.pass_obj
 def release_cmd(repos: Tuple[git.Repo, Repository]) -> None:
-    # create a new release
-    pass
+    release(repos[1])
 
 
 if __name__ == "__main__":

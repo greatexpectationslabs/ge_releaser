@@ -12,6 +12,7 @@ AZURE_BUILDS: str = (
     "https://dev.azure.com/great-expectations/great_expectations/_build?definitionId=1"
 )
 PYPI_PAGE: str = "https://pypi.org/project/great-expectations/#history"
+RELEASES: str = "https://github.com/great-expectations/great_expectations/releases"
 
 
 def all_constants_are_valid() -> bool:

@@ -156,11 +156,9 @@ def checkout_and_update_develop(git_repo: git.Repo) -> None:
     git_repo.git.pull("origin", "develop")
 
 
-def parse_versions(
-    deployment_version_path: str, version_number: str
-) -> Tuple[version.Version, version.Version]:
+def parse_versions(version_number: str) -> Tuple[version.Version, version.Version]:
     current_version: version.Version
-    with open(deployment_version_path) as f:
+    with open(DEPLOYMENT_VERSION) as f:
         contents: str = str(f.read()).strip()
         current_version = cast(version.Version, version.parse(contents))
 
@@ -267,9 +265,7 @@ def prep(
     click.secho("[prep]", bold=True, fg="blue")
 
     checkout_and_update_develop(git_repo)
-    current_version, release_version = parse_versions(
-        DEPLOYMENT_VERSION, version_number
-    )
+    current_version, release_version = parse_versions(version_number)
 
     release_branch: str = create_and_checkout_release_branch(git_repo)
     click.secho(" * Created a release branch (1/5)", fg="yellow")
