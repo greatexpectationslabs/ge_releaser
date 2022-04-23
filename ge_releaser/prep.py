@@ -1,23 +1,21 @@
 import datetime as dt
 import enum
-import re
 from collections import defaultdict
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Set, Tuple, cast
+from typing import Dict, List, Optional, Tuple, cast
 
 import click
 import git
 from github.Commit import Commit
+from github.MainClass import Github
+from github.NamedUser import NamedUser
+from github.Organization import Organization
 from github.PullRequest import PullRequest
 from github.Repository import Repository
 from packaging import version
 
-from ge_releaser.constants import (
-    CHANGELOG_MD,
-    CHANGELOG_RST,
-    DEPLOYMENT_VERSION,
-    TEAMS_YAML,
-)
+from ge_releaser.env import Environment
+from ge_releaser.util import get_user_confirmation
 
 
 class ChangelogCategory(enum.Enum):
@@ -158,7 +156,7 @@ def checkout_and_update_develop(git_repo: git.Repo) -> None:
 
 def parse_versions(version_number: str) -> Tuple[version.Version, version.Version]:
     current_version: version.Version
-    with open(DEPLOYMENT_VERSION) as f:
+    with open(Environment.DEPLOYMENT_VERSION) as f:
         contents: str = str(f.read()).strip()
         current_version = cast(version.Version, version.parse(contents))
 
@@ -176,78 +174,71 @@ def create_and_checkout_release_branch(git_repo: git.Repo) -> str:
     return branch_name
 
 
-def update_deployment_version_file(
-    deployment_version_path: str, release_version: version.Version
-) -> None:
-    with open(deployment_version_path, "w") as f:
+def update_deployment_version_file(release_version: version.Version) -> None:
+    with open(Environment.DEPLOYMENT_VERSION, "w") as f:
         f.write(f"{str(release_version).strip()}\n")
 
 
 def update_changelogs(
     git_repo: git.Repo,
+    github: Github,
     github_repo: Repository,
     current_version: version.Version,
     release_version: version.Version,
 ) -> None:
     changelog_commits: List[ChangelogCommit] = _collect_changelog_items(
-        git_repo, github_repo, current_version
+        git_repo, github, github_repo, current_version
     )
 
     changelog_entry: ChangelogEntry = ChangelogEntry(changelog_commits)
     changelog_entry.classify_unknowns()
 
-    changelog_entry.write(CHANGELOG_MD, current_version, release_version)
-    changelog_entry.write(CHANGELOG_RST, current_version, release_version)
+    changelog_entry.write(Environment.CHANGELOG_MD, current_version, release_version)
+    changelog_entry.write(Environment.CHANGELOG_RST, current_version, release_version)
 
 
 def _collect_changelog_items(
-    git_repo: git.Repo, github_repo: Repository, current_version: version.Version
+    git_repo: git.Repo,
+    github: Github,
+    github_repo: Repository,
+    current_version: version.Version,
 ) -> List[ChangelogCommit]:
     changelog_contents: str = git_repo.git.log(
         "--oneline", "--no-abbrev-commit", f"{current_version}..HEAD"
     )
 
-    core_team: Set[str] = _determine_core_team()
+    superconductive_org: Organization = github.get_organization(login="Superconductive")
 
     changelog_commits: List[ChangelogCommit] = []
     for line in changelog_contents.split("\n"):
         commit_hash, title = line.split(" ", maxsplit=1)
         commit_details: Commit = github_repo.get_commit(commit_hash)
-        author: Optional[str] = commit_details.author.login
+        author: NamedUser = commit_details.author
 
-        # Don't want attribution for core team
-        if author in core_team:
-            author = None
+        login: Optional[str]
+        if superconductive_org.has_in_members(author):
+            login = author.login
+        else:
+            login = None
 
-        changelog_commit: ChangelogCommit = ChangelogCommit(commit_hash, title, author)
+        changelog_commit: ChangelogCommit = ChangelogCommit(commit_hash, title, login)
         changelog_commits.append(changelog_commit)
 
     return changelog_commits
 
 
-def _determine_core_team():
-    with open(TEAMS_YAML, "r") as f:
-        contents: str = f.read()
-
-    core_team: Set[str] = set()
-
-    r: re.Pattern = re.compile(r"@(\w+)")
-    matches: List[str] = r.findall(contents)
-    for name in matches:
-        core_team.add(name)
-
-    return core_team
-
-
 def commit_changes(git_repo: git.Repo) -> None:
-    git_repo.git.add(DEPLOYMENT_VERSION)
-    git_repo.git.add(CHANGELOG_MD)
-    git_repo.git.add(CHANGELOG_RST)
+    git_repo.git.add(Environment.DEPLOYMENT_VERSION)
+    git_repo.git.add(Environment.CHANGELOG_MD)
+    git_repo.git.add(Environment.CHANGELOG_RST)
     git_repo.git.commit("-m", "release prep")
 
 
 def create_pr(git_repo: git.Repo, github_repo: Repository, release_branch: str) -> str:
     git_repo.git.push("--set-upstream", "origin", release_branch)
+
+    get_user_confirmation("\nAre you sure you want to open a PR [y/n]: ")
+
     pr: PullRequest = github_repo.create_pull(
         title=release_branch,
         body=f"release prep for {dt.date.today()}",
@@ -258,10 +249,13 @@ def create_pr(git_repo: git.Repo, github_repo: Repository, release_branch: str) 
 
 
 def prep(
-    git_repo: git.Repo,
-    github_repo: Repository,
+    env: Environment,
     version_number: str,
 ) -> None:
+    git_repo: git.Repo = env.git_repo
+    github: Github = env.github
+    github_repo: Repository = env.github_repo
+
     click.secho("[prep]", bold=True, fg="blue")
 
     checkout_and_update_develop(git_repo)
@@ -270,10 +264,10 @@ def prep(
     release_branch: str = create_and_checkout_release_branch(git_repo)
     click.secho(" * Created a release branch (1/5)", fg="yellow")
 
-    update_deployment_version_file(DEPLOYMENT_VERSION, release_version)
+    update_deployment_version_file(release_version)
     click.secho(" * Updated deployment version file (2/5)", fg="yellow")
 
-    update_changelogs(git_repo, github_repo, current_version, release_version)
+    update_changelogs(git_repo, github, github_repo, current_version, release_version)
     click.secho(" * Updated changelogs (3/5)", fg="yellow")
 
     commit_changes(git_repo)

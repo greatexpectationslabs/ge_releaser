@@ -1,8 +1,9 @@
-import sys
 import click
 import git
 
-from ge_releaser.constants import AZURE_BUILDS, PYPI_PAGE
+from ge_releaser.env import Environment
+from ge_releaser.util import get_user_confirmation
+
 
 def update_local_branches_and_switch_to_main(git_repo: git.Repo) -> None:
     git_repo.git.fetch("--all")
@@ -13,15 +14,15 @@ def update_local_branches_and_switch_to_main(git_repo: git.Repo) -> None:
 def merge_develop(git_repo: git.Repo) -> None:
     git_repo.git.merge("origin/develop")
 
-def cut_release(git_repo: git.Repo) -> None:
-    confirmation: str = input("\nAre you sure you want to cut the release [y/n]: ")
-    if not confirmation.lower().startswith("y"):
-        sys.exit(1)
 
+def cut_release(git_repo: git.Repo) -> None:
+    get_user_confirmation("\nAre you sure you want to cut the release [y/n]: ")
     git_repo.git.push("origin", "main")
 
 
-def cut(git_repo: git.Repo):
+def cut(env: Environment) -> None:
+    git_repo: git.Repo = env.git_repo
+
     click.secho("[cut]", bold=True, fg="blue")
 
     update_local_branches_and_switch_to_main(git_repo)
@@ -37,5 +38,5 @@ def cut(git_repo: git.Repo):
         f"\n[SUCCESS] Please wait for the build process and PyPI publishing to complete before moving to the `tag` cmd.",
         fg="green",
     )
-    click.echo(f"Link to Azure build: {AZURE_BUILDS}")
-    click.echo(f"Link to PyPI page: {PYPI_PAGE}")
+    click.echo(f"Link to Azure build: {Environment.AZURE_BUILDS}")
+    click.echo(f"Link to PyPI page: {Environment.PYPI_PAGE}")

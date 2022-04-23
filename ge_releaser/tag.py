@@ -4,11 +4,12 @@ import click
 import git
 from packaging import version
 
-from ge_releaser.constants import DEPLOYMENT_VERSION
+from ge_releaser.env import Environment
+from ge_releaser.util import get_user_confirmation
 
 
 def parse_release_version() -> str:
-    with open(DEPLOYMENT_VERSION) as f:
+    with open(Environment.DEPLOYMENT_VERSION) as f:
         contents: str = str(f.read()).strip()
 
     release_version: Union[version.Version, version.LegacyVersion] = version.parse(
@@ -23,6 +24,7 @@ def tag_latest_main(git_repo: git.Repo, release_version: str) -> None:
 
 
 def push_tag_to_remote(git_repo: git.Repo, release_version: str) -> None:
+    get_user_confirmation("\nAre you sure you want to publish this tag [y/n]: ")
     git_repo.git.push("origin", release_version)
 
 
@@ -32,7 +34,9 @@ def update_develop_with_tag(git_repo: git.Repo) -> None:
     git_repo.git.merge("main")
 
 
-def tag(git_repo: git.Repo) -> None:
+def tag(env: Environment) -> None:
+    git_repo: git.Repo = env.git_repo
+
     click.secho("[tag]", bold=True, fg="blue")
 
     release_version: str = parse_release_version()
