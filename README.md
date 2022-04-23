@@ -17,6 +17,7 @@ the service's rate limiting.
   2. Save that token with `export GITHUB_TOKEN=...`
 
 Make sure you enable the appropriate read/write priviledges when setting up your token (PR's, tags, releases, etc).
+Additionally, you must [authorize your token for use with SAML SSO](https://docs.github.com/en/enterprise-cloud@latest/authentication/authenticating-with-saml-single-sign-on/authorizing-a-personal-access-token-for-use-with-saml-single-sign-on).
 
 ---
 

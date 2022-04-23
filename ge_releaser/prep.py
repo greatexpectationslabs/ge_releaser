@@ -1,14 +1,11 @@
 import datetime as dt
 import enum
+import re
 from collections import defaultdict
-from dataclasses import dataclass
-from typing import Dict, List, Optional, Tuple, cast
+from typing import Dict, List, Tuple, cast
 
 import click
 import git
-from github.Commit import Commit
-from github.MainClass import Github
-from github.NamedUser import NamedUser
 from github.Organization import Organization
 from github.PullRequest import PullRequest
 from github.Repository import Repository
@@ -27,22 +24,53 @@ class ChangelogCategory(enum.Enum):
     UNKNOWN = "UNKNOWN"
 
 
-@dataclass
 class ChangelogCommit:
-    hash: str
-    contents: str
-    author: Optional[str]
+    def __init__(self, pr: PullRequest, github_org: Organization) -> None:
+        if pr.title[0] == "[":
+            try:
+                self.pr_type, self.desc = re.match(
+                    r"\[([a-zA-Z]+)\] ?(.*)", pr.title
+                ).group(1, 2)
+                self.pr_type = ChangelogCategory[self.pr_type.upper()]
+                if self.pr_type not in ChangelogCategory:
+                    self.pr_type = ChangelogCategory.MAINTENANCE
+            except AttributeError:
+                print(f"Couldn't parse PR title: {pr.title}")
+                return
+        else:
+            self.pr_type = ChangelogCategory.MAINTENANCE
+            self.desc = pr.title
+        self.number = pr.number
+        self.merge_timestamp = pr.merged_at
+        self.attribution = (
+            f" (thanks @{pr.user.login})"
+            if not github_org.has_in_members(pr.user)
+            else ""
+        )
+
+    def sort_key(self) -> Tuple[int, dt.datetime]:
+        categories: Dict[ChangelogCategory, int] = {
+            c: i + 1 for i, c in enumerate(ChangelogCategory)
+        }
+        return categories[self.pr_type], self.merge_timestamp
 
     def __str__(self) -> str:
-        value: str = f"* {self.contents}"
-        if self.author is not None:
-            value += f" (thanks @{self.author})"
-        return value
+        return (
+            f"* [{self.pr_type.value}] {self.desc} (#{self.number}){self.attribution}"
+        )
 
 
 class ChangelogEntry:
-    def __init__(self, commits: List[ChangelogCommit]):
-        self.commits = ChangelogEntry._sort_changelog_items_by_category(commits)
+    def __init__(
+        self, github_org: Organization, pull_requests: List[PullRequest]
+    ) -> None:
+        changelog_commits: List[ChangelogCommit] = []
+        for pr in pull_requests:
+            changelog_commit: ChangelogCommit = ChangelogCommit(pr, github_org)
+            changelog_commits.append(changelog_commit)
+
+        changelog_commits.sort(key=ChangelogCommit.sort_key)
+        self.commits = changelog_commits
 
     def write(
         self,
@@ -96,36 +124,10 @@ class ChangelogEntry:
 
     def _render_contents(self) -> List[str]:
         rendered: List[str] = []
-        for category in ChangelogCategory:
-            commits: List[ChangelogCommit] = self.commits.get(category, [])
-            for commit in commits:
-                rendered.append(f"{commit}\n")
+        for commit in self.commits:
+            rendered.append(f"{commit}\n")
 
         return rendered
-
-    def classify_unknowns(self) -> None:
-        unassigned_commits: List[ChangelogCommit] = self.commits.get(
-            ChangelogCategory.UNKNOWN, []
-        )
-        if unassigned_commits:
-            for commit in unassigned_commits:
-                print(f'\nSelect a classification for: "{commit.contents}"')
-
-                response: int = 0
-                while response not in [1, 2, 3, 4, 5]:
-                    response = int(
-                        input(
-                            "  1) [BREAKING]\n  2) [FEATURE]\n  3) [BUGFIX]\n  4) [DOCS]\n  5) [MAINTENANCE]\n: "
-                        )
-                    )
-
-                category: ChangelogCategory = [c for c in ChangelogCategory][
-                    response - 1
-                ]
-                commit.contents = f"[{category.value}] {commit.contents}"
-                self.commits[category].append(commit)
-
-        del self.commits[ChangelogCategory.UNKNOWN]
 
     @staticmethod
     def _sort_changelog_items_by_category(
@@ -138,7 +140,7 @@ class ChangelogEntry:
         for commit in changelog_commits:
             added_commit: bool = False
             for category in ChangelogCategory:
-                if category.value in commit.contents:
+                if category.value in commit.desc:
                     commit_by_category[category].append(commit)
                     added_commit = True
                     break
@@ -180,51 +182,40 @@ def update_deployment_version_file(release_version: version.Version) -> None:
 
 
 def update_changelogs(
-    git_repo: git.Repo,
-    github: Github,
+    github_org: Organization,
     github_repo: Repository,
     current_version: version.Version,
     release_version: version.Version,
 ) -> None:
-    changelog_commits: List[ChangelogCommit] = _collect_changelog_items(
-        git_repo, github, github_repo, current_version
+    relevant_prs: List[PullRequest] = _collect_prs_since_last_release(
+        github_repo, current_version
     )
 
-    changelog_entry: ChangelogEntry = ChangelogEntry(changelog_commits)
-    changelog_entry.classify_unknowns()
+    changelog_entry: ChangelogEntry = ChangelogEntry(github_org, relevant_prs)
 
     changelog_entry.write(Environment.CHANGELOG_MD, current_version, release_version)
     changelog_entry.write(Environment.CHANGELOG_RST, current_version, release_version)
 
 
-def _collect_changelog_items(
-    git_repo: git.Repo,
-    github: Github,
+def _collect_prs_since_last_release(
     github_repo: Repository,
     current_version: version.Version,
-) -> List[ChangelogCommit]:
-    changelog_contents: str = git_repo.git.log(
-        "--oneline", "--no-abbrev-commit", f"{current_version}..HEAD"
+) -> List[PullRequest]:
+    last_release: dt.datetime = github_repo.get_release(str(current_version)).created_at
+    merged_prs = github_repo.get_pulls(
+        base="develop", state="closed", sort="updated", direction="desc"
     )
+    recent_prs: List[PullRequest] = []
+    for pr in merged_prs:
+        if not pr.merged or "release candidate" in pr.title:
+            continue
+        # if we're seeing PRs merged more than a week before release, assume we've covered everything
+        if pr.merged_at < (last_release - dt.timedelta(days=7)):
+            break
+        if pr.merged_at > last_release:
+            recent_prs.append(pr)
 
-    superconductive_org: Organization = github.get_organization(login="Superconductive")
-
-    changelog_commits: List[ChangelogCommit] = []
-    for line in changelog_contents.split("\n"):
-        commit_hash, title = line.split(" ", maxsplit=1)
-        commit_details: Commit = github_repo.get_commit(commit_hash)
-        author: NamedUser = commit_details.author
-
-        login: Optional[str]
-        if superconductive_org.has_in_members(author):
-            login = author.login
-        else:
-            login = None
-
-        changelog_commit: ChangelogCommit = ChangelogCommit(commit_hash, title, login)
-        changelog_commits.append(changelog_commit)
-
-    return changelog_commits
+    return recent_prs
 
 
 def commit_changes(git_repo: git.Repo) -> None:
@@ -239,9 +230,10 @@ def create_pr(git_repo: git.Repo, github_repo: Repository, release_branch: str) 
 
     get_user_confirmation("\nAre you sure you want to open a PR [y/n]: ")
 
+    timestamp: dt.date = dt.date.today()
     pr: PullRequest = github_repo.create_pull(
-        title=release_branch,
-        body=f"release prep for {dt.date.today()}",
+        title=f"release candidate {timestamp}",
+        body=f"release prep for {timestamp}",
         head=release_branch,
         base="develop",
     )
@@ -253,9 +245,10 @@ def prep(
     version_number: str,
 ) -> None:
     git_repo: git.Repo = env.git_repo
-    github: Github = env.github
     github_repo: Repository = env.github_repo
+    github_org: Organization = env.github_org
 
+    breakpoint()
     click.secho("[prep]", bold=True, fg="blue")
 
     checkout_and_update_develop(git_repo)
@@ -267,7 +260,7 @@ def prep(
     update_deployment_version_file(release_version)
     click.secho(" * Updated deployment version file (2/5)", fg="yellow")
 
-    update_changelogs(git_repo, github, github_repo, current_version, release_version)
+    update_changelogs(github_org, github_repo, current_version, release_version)
     click.secho(" * Updated changelogs (3/5)", fg="yellow")
 
     commit_changes(git_repo)

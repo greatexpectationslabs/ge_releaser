@@ -3,6 +3,7 @@ from typing import List
 
 import git
 import github
+from github.Organization import Organization
 from github.Repository import Repository
 
 
@@ -24,8 +25,9 @@ class Environment:
             Environment._all_constants_are_valid()
         ), "One or more constants not found! Please ensure you're in the root of the OSS repo."
         self.git_repo: git.Repo = git.Repo()
-        self.github: github.Github = github.Github(token)
-        self.github_repo: Repository = self.github.get_repo(Environment.GITHUB_REPO)
+        gh: github.Github = github.Github(token)
+        self.github_repo: Repository = gh.get_repo(Environment.GITHUB_REPO)
+        self.github_org: Organization = gh.get_organization(login="Superconductive")
 
     @staticmethod
     def _all_constants_are_valid() -> bool:
