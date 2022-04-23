@@ -6,6 +6,7 @@ A CLI tool built to streamline the process of cutting releases each week in the 
 
 #### Installation
 ```bash
+# Preferably run all this in your preferred venv
 git clone git@github.com:superconductive/ge_releaser.git
 pip install -e .
 ```
@@ -15,7 +16,7 @@ the service's rate limiting.
   1. Follow the steps [here](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) to create a token.
   2. Save that token with `export GITHUB_TOKEN=...`
 
-Make sure you enable the appropriate read/write privledges when setting up your token (PR's, tags, releases, etc).
+Make sure you enable the appropriate read/write priviledges when setting up your token (PR's, tags, releases, etc).
 
 ---
 
