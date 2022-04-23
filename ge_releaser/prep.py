@@ -1,7 +1,6 @@
 import datetime as dt
 import enum
 import re
-from collections import defaultdict
 from typing import Dict, List, Tuple, cast
 
 import click
@@ -21,7 +20,6 @@ class ChangelogCategory(enum.Enum):
     BUGFIX = "BUGFIX"
     DOCS = "DOCS"
     MAINTENANCE = "MAINTENANCE"
-    UNKNOWN = "UNKNOWN"
 
 
 class ChangelogCommit:
@@ -129,27 +127,6 @@ class ChangelogEntry:
 
         return rendered
 
-    @staticmethod
-    def _sort_changelog_items_by_category(
-        changelog_commits: List[ChangelogCommit],
-    ) -> Dict[ChangelogCategory, List[ChangelogCommit]]:
-        commit_by_category: Dict[
-            ChangelogCategory, List[ChangelogCommit]
-        ] = defaultdict(list)
-
-        for commit in changelog_commits:
-            added_commit: bool = False
-            for category in ChangelogCategory:
-                if category.value in commit.desc:
-                    commit_by_category[category].append(commit)
-                    added_commit = True
-                    break
-
-            if not added_commit:
-                commit_by_category[ChangelogCategory.UNKNOWN].append(commit)
-
-        return commit_by_category
-
 
 def checkout_and_update_develop(git_repo: git.Repo) -> None:
     git_repo.git.checkout("develop")
@@ -248,7 +225,6 @@ def prep(
     github_repo: Repository = env.github_repo
     github_org: Organization = env.github_org
 
-    breakpoint()
     click.secho("[prep]", bold=True, fg="blue")
 
     checkout_and_update_develop(git_repo)
