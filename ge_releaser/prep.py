@@ -6,6 +6,7 @@ from typing import Dict, List, Tuple, cast
 import click
 import git
 from github.Organization import Organization
+from github.PaginatedList import PaginatedList
 from github.PullRequest import PullRequest
 from github.Repository import Repository
 from packaging import version
@@ -179,12 +180,12 @@ def _collect_prs_since_last_release(
     current_version: version.Version,
 ) -> List[PullRequest]:
     last_release: dt.datetime = github_repo.get_release(str(current_version)).created_at
-    merged_prs = github_repo.get_pulls(
+    merged_prs: PaginatedList[PullRequest] = github_repo.get_pulls(
         base="develop", state="closed", sort="updated", direction="desc"
     )
     recent_prs: List[PullRequest] = []
     for pr in merged_prs:
-        if not pr.merged or "release candidate" in pr.title:
+        if not pr.merged or "release" in pr.title.lower():
             continue
         # if we're seeing PRs merged more than a week before release, assume we've covered everything
         if pr.merged_at < (last_release - dt.timedelta(days=7)):

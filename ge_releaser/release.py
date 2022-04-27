@@ -54,7 +54,7 @@ def release(env: Environment) -> None:
     release_version: str = parse_release_version()
 
     create_release(github_repo, release_version, draft=False)
-    click.secho(" * Created draft release (1/1)", fg="yellow")
+    click.secho(" * Created release page (1/1)", fg="yellow")
 
     click.secho(
         f"\n[SUCCESS] Please review and publish your release. Congratulations, you've finished the release process :)",
