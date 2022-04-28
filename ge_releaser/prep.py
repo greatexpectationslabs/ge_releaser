@@ -27,12 +27,15 @@ class ChangelogCommit:
     def __init__(self, pr: PullRequest, github_org: Organization) -> None:
         if pr.title[0] == "[":
             try:
-                self.pr_type, self.desc = re.match(
-                    r"\[([a-zA-Z]+)\] ?(.*)", pr.title
-                ).group(1, 2)
-                self.pr_type = ChangelogCategory[self.pr_type.upper()]
-                if self.pr_type not in ChangelogCategory:
-                    self.pr_type = ChangelogCategory.MAINTENANCE
+                type_, self.desc = re.match(r"\[([a-zA-Z]+)\] ?(.*)", pr.title).group(
+                    1, 2
+                )
+                type_ = type_.upper()
+                self.pr_type = (
+                    ChangelogCategory[type_]
+                    if type_ in ChangelogCategory.__members__
+                    else ChangelogCategory.MAINTENANCE
+                )
             except AttributeError:
                 print(f"Couldn't parse PR title: {pr.title}")
                 return
