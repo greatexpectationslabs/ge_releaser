@@ -8,6 +8,7 @@ A CLI tool built to streamline the process of cutting releases each week in the 
 ```bash
 # Preferably run all this in your preferred venv
 git clone git@github.com:superconductive/ge_releaser.git
+cd ge_releaser
 pip install -e .
 ```
 
