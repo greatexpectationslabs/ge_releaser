@@ -40,9 +40,9 @@ The tool is designed to do pretty much EVERYTHING for you. Do not run isolated `
 - Run `qn tag` and get your PR approved and merged - [Loom walkthrough]()
 - Run `qn release` - [Loom walkthrough]()
 
-## Manual Process
+### Manual Process
 
-#### prep
+#### prep:
 - Pull remote changes into your local `develop`.
   - Command: `git checkout develop; git pull origin/develop`
 - Create a new branch from `develop` called `release-prep-YYYY-MM-DD`.
@@ -57,7 +57,7 @@ The tool is designed to do pretty much EVERYTHING for you. Do not run isolated `
 - Receive approval and merge the PR.
   - You will have to wait for Azure CI/CD to run its checks.
 
-#### cut
+#### cut:
 - Update your local branches and checkout `main`
   - Command: `git fetch --all; git checkout main; git pull`
 - Create a new branch from `main` called `release-cut-YYYY-MM-DD`.
@@ -68,13 +68,12 @@ The tool is designed to do pretty much EVERYTHING for you. Do not run isolated `
   - You will have to wait for Azure CI/CD to run its checks.
   - Confirm that the new version is uploaded to PyPI.
 
-#### tag
+#### tag:
 - Create a tag for the new release.
   - Command: `git tag -a <release_version> -m "<release_version>"; git push origin <release_version>`
 - Create a PR against `develop` that the tagged commit becomes part of the history for `develop`.
 - Receive approval and merge the PR.
   - You will have to wait for Azure CI/CD to run its checks.
 
-#### release
+#### release:
 - Create a release entry in GitHub.
- 
