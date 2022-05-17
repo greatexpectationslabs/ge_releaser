@@ -1,7 +1,6 @@
 import datetime as dt
-import enum
-import re
-from typing import Dict, List, Tuple, cast
+import os
+from typing import List, Tuple, cast
 
 import click
 import git
@@ -11,162 +10,82 @@ from github.PullRequest import PullRequest
 from github.Repository import Repository
 from packaging import version
 
-from ge_releaser.env import Environment
-from ge_releaser.util import get_user_confirmation
+from ge_releaser.changelog import ChangelogEntry
+from ge_releaser.cli import GitEnvironment
+from ge_releaser.constants import (
+    CHANGELOG_MD,
+    CHANGELOG_RST,
+    DEPLOYMENT_VERSION,
+    PULL_REQUESTS,
+)
+from ge_releaser.util import checkout_and_update_develop, parse_deployment_version_file
 
 
-class ChangelogCategory(enum.Enum):
-    BREAKING = "BREAKING"
-    FEATURE = "FEATURE"
-    BUGFIX = "BUGFIX"
-    DOCS = "DOCS"
-    MAINTENANCE = "MAINTENANCE"
+def prep(
+    env: GitEnvironment,
+    version_number: str,
+) -> None:
+    click.secho("[prep]", bold=True, fg="blue")
+
+    checkout_and_update_develop(env.git_repo)
+    current_version, release_version = _parse_versions(version_number)
+
+    release_branch: str = _create_and_checkout_release_branch(
+        env.git_repo, release_version
+    )
+    click.secho(" * Created a release branch (1/5)", fg="yellow")
+
+    _update_deployment_version_file(release_version)
+    click.secho(" * Updated deployment version file (2/5)", fg="yellow")
+
+    _update_changelogs(
+        env.github_org, env.github_repo, current_version, release_version
+    )
+    click.secho(" * Updated changelogs (3/5)", fg="yellow")
+
+    _commit_changes(env.git_repo)
+    click.secho(" * Committed changes (4/5)", fg="yellow")
+
+    url: str = _create_pr(
+        env.git_repo, env.github_repo, release_branch, release_version
+    )
+    click.secho(" * Opened prep PR (5/5)", fg="yellow")
+
+    click.secho(
+        f"\n[SUCCESS] Please review, approve, and merge PR before continuing to `tag` command",
+        fg="green",
+    )
+    click.echo(f"Link to PR: {url}")
 
 
-class ChangelogCommit:
-    def __init__(self, pr: PullRequest, github_org: Organization) -> None:
-        if pr.title[0] == "[":
-            try:
-                type_, self.desc = re.match(r"\[([a-zA-Z]+)\] ?(.*)", pr.title).group(
-                    1, 2
-                )
-                type_ = type_.upper()
-                self.pr_type = (
-                    ChangelogCategory[type_]
-                    if type_ in ChangelogCategory.__members__
-                    else ChangelogCategory.MAINTENANCE
-                )
-            except AttributeError:
-                print(f"Couldn't parse PR title: {pr.title}")
-                return
-        else:
-            self.pr_type = ChangelogCategory.MAINTENANCE
-            self.desc = pr.title
-        self.number = pr.number
-        self.merge_timestamp = pr.merged_at
-        self.attribution = (
-            f" (thanks @{pr.user.login})"
-            if not github_org.has_in_members(pr.user)
-            else ""
-        )
-
-    def sort_key(self) -> Tuple[int, dt.datetime]:
-        categories: Dict[ChangelogCategory, int] = {
-            c: i + 1 for i, c in enumerate(ChangelogCategory)
-        }
-        return categories[self.pr_type], self.merge_timestamp
-
-    def __str__(self) -> str:
-        return (
-            f"* [{self.pr_type.value}] {self.desc} (#{self.number}){self.attribution}"
-        )
-
-
-class ChangelogEntry:
-    def __init__(
-        self, github_org: Organization, pull_requests: List[PullRequest]
-    ) -> None:
-        changelog_commits: List[ChangelogCommit] = []
-        for pr in pull_requests:
-            changelog_commit: ChangelogCommit = ChangelogCommit(pr, github_org)
-            changelog_commits.append(changelog_commit)
-
-        changelog_commits.sort(key=ChangelogCommit.sort_key)
-        self.commits = changelog_commits
-
-    def write(
-        self,
-        outfile: str,
-        current_version: version.Version,
-        release_version: version.Version,
-    ) -> None:
-        with open(outfile, "r") as f:
-            contents: List[str] = f.readlines()
-
-        insertion_point: int = 0
-        for i, line in enumerate(contents):
-            if str(current_version) in line:
-                insertion_point = i - 1
-
-        assert (
-            insertion_point > 0
-        ), "Could not find appropriate insertion point for new changelog entry"
-
-        if outfile.endswith(".md"):
-            contents[insertion_point:insertion_point] = self._render_to_md(
-                release_version
-            )
-        elif outfile.endswith(".rst"):
-            contents[insertion_point:insertion_point] = self._render_to_rst(
-                release_version
-            )
-        else:
-            raise Exception()
-
-        with open(outfile, "w") as f:
-            f.writelines(contents)
-
-    def _render_to_md(self, release_version: version.Version) -> List[str]:
-        rendered: List[str] = []
-        title: str = f"\n### {release_version}\n"
-        rendered.append(title)
-        contents: List[str] = self._render_contents()
-        rendered.extend(contents)
-        return rendered
-
-    def _render_to_rst(self, release_version: version.Version) -> List[str]:
-        rendered: List[str] = []
-        title: str = f"\n{release_version}\n"
-        rendered.append(title)
-        divider: str = "-----------------\n"
-        rendered.append(divider)
-        contents: List[str] = self._render_contents()
-        rendered.extend(contents)
-        return rendered
-
-    def _render_contents(self) -> List[str]:
-        rendered: List[str] = []
-        for commit in self.commits:
-            rendered.append(f"{commit}\n")
-
-        return rendered
-
-
-def checkout_and_update_develop(git_repo: git.Repo) -> None:
-    git_repo.git.checkout("develop")
-    git_repo.git.pull("origin", "develop")
-
-
-def parse_versions(version_number: str) -> Tuple[version.Version, version.Version]:
-    current_version: version.Version
-    with open(Environment.DEPLOYMENT_VERSION) as f:
-        contents: str = str(f.read()).strip()
-        current_version = cast(version.Version, version.parse(contents))
-
+def _parse_versions(version_number: str) -> Tuple[str, str]:
+    current_version: version.Version = parse_deployment_version_file()
     release_version: version.Version = cast(
         version.Version, version.parse(version_number)
     )
     assert release_version > current_version, "Version provided to command is not valid"
 
-    return current_version, release_version
+    return str(current_version), str(release_version)
 
 
-def create_and_checkout_release_branch(git_repo: git.Repo) -> str:
-    branch_name: str = f"release-prep-{dt.date.today()}"
+def _create_and_checkout_release_branch(
+    git_repo: git.Repo, release_version: str
+) -> str:
+    branch_name: str = f"release-{release_version}"
     git_repo.git.checkout("HEAD", b=branch_name)
     return branch_name
 
 
-def update_deployment_version_file(release_version: version.Version) -> None:
-    with open(Environment.DEPLOYMENT_VERSION, "w") as f:
-        f.write(f"{str(release_version).strip()}\n")
+def _update_deployment_version_file(release_version: str) -> None:
+    with open(DEPLOYMENT_VERSION, "w") as f:
+        f.write(f"{release_version.strip()}\n")
 
 
-def update_changelogs(
+def _update_changelogs(
     github_org: Organization,
     github_repo: Repository,
-    current_version: version.Version,
-    release_version: version.Version,
+    current_version: str,
+    release_version: str,
 ) -> None:
     relevant_prs: List[PullRequest] = _collect_prs_since_last_release(
         github_repo, current_version
@@ -174,15 +93,15 @@ def update_changelogs(
 
     changelog_entry: ChangelogEntry = ChangelogEntry(github_org, relevant_prs)
 
-    changelog_entry.write(Environment.CHANGELOG_MD, current_version, release_version)
-    changelog_entry.write(Environment.CHANGELOG_RST, current_version, release_version)
+    changelog_entry.write(CHANGELOG_MD, current_version, release_version)
+    changelog_entry.write(CHANGELOG_RST, current_version, release_version)
 
 
 def _collect_prs_since_last_release(
     github_repo: Repository,
-    current_version: version.Version,
+    current_version: str,
 ) -> List[PullRequest]:
-    last_release: dt.datetime = github_repo.get_release(str(current_version)).created_at
+    last_release: dt.datetime = github_repo.get_release(current_version).created_at
     merged_prs: PaginatedList[PullRequest] = github_repo.get_pulls(
         base="develop", state="closed", sort="updated", direction="desc"
     )
@@ -199,58 +118,26 @@ def _collect_prs_since_last_release(
     return recent_prs
 
 
-def commit_changes(git_repo: git.Repo) -> None:
-    git_repo.git.add(Environment.DEPLOYMENT_VERSION)
-    git_repo.git.add(Environment.CHANGELOG_MD)
-    git_repo.git.add(Environment.CHANGELOG_RST)
+def _commit_changes(git_repo: git.Repo) -> None:
+    git_repo.git.add(DEPLOYMENT_VERSION)
+    git_repo.git.add(CHANGELOG_MD)
+    git_repo.git.add(CHANGELOG_RST)
     git_repo.git.commit("-m", "release prep")
 
 
-def create_pr(git_repo: git.Repo, github_repo: Repository, release_branch: str) -> str:
+def _create_pr(
+    git_repo: git.Repo,
+    github_repo: Repository,
+    release_branch: str,
+    release_version: str,
+) -> str:
     git_repo.git.push("--set-upstream", "origin", release_branch)
 
-    get_user_confirmation("\nAre you sure you want to open a PR [y/n]: ")
-
-    timestamp: dt.date = dt.date.today()
     pr: PullRequest = github_repo.create_pull(
-        title=f"release candidate {timestamp}",
-        body=f"release prep for {timestamp}",
+        title=f"[RELEASE] {release_version}",
+        body=f"release prep for {release_version}",
         head=release_branch,
         base="develop",
     )
-    return f"https://github.com/great-expectations/great_expectations/pull/{pr.number}"
 
-
-def prep(
-    env: Environment,
-    version_number: str,
-) -> None:
-    git_repo: git.Repo = env.git_repo
-    github_repo: Repository = env.github_repo
-    github_org: Organization = env.github_org
-
-    click.secho("[prep]", bold=True, fg="blue")
-
-    checkout_and_update_develop(git_repo)
-    current_version, release_version = parse_versions(version_number)
-
-    release_branch: str = create_and_checkout_release_branch(git_repo)
-    click.secho(" * Created a release branch (1/5)", fg="yellow")
-
-    update_deployment_version_file(release_version)
-    click.secho(" * Updated deployment version file (2/5)", fg="yellow")
-
-    update_changelogs(github_org, github_repo, current_version, release_version)
-    click.secho(" * Updated changelogs (3/5)", fg="yellow")
-
-    commit_changes(git_repo)
-    click.secho(" * Committed changes (4/5)", fg="yellow")
-
-    url: str = create_pr(git_repo, github_repo, release_branch)
-    click.secho(" * Opened prep PR (5/5)", fg="yellow")
-
-    click.secho(
-        f"\n[SUCCESS] Please review, approve, and merge PR before continuing to `cut` command",
-        fg="green",
-    )
-    click.echo(f"Link to PR: {url}")
+    return os.path.join(PULL_REQUESTS, str(pr.number))

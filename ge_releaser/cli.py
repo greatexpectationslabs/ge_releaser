@@ -3,8 +3,8 @@ from typing import Optional
 
 import click
 
-from ge_releaser.cut import cut
-from ge_releaser.env import Environment
+from ge_releaser.constants import GITHUB_REPO
+from ge_releaser.git import GitEnvironment
 from ge_releaser.prep import prep
 from ge_releaser.release import release
 from ge_releaser.tag import tag
@@ -23,34 +23,26 @@ def cli(ctx: click.Context) -> None:
     token: Optional[str] = os.environ.get("GITHUB_TOKEN")
     assert token is not None, "Must set GITHUB_TOKEN environment variable!"
 
-    env: Environment = Environment(token)
+    env: GitEnvironment = GitEnvironment(token, GITHUB_REPO)
     ctx.obj = env
 
 
 @cli.command(name="prep", help="Prepare changelog/release version PR")
 @click.argument("version_number", type=str, nargs=1)
 @click.pass_obj
-def prep_cmd(env: Environment, version_number: str) -> None:
+def prep_cmd(env: GitEnvironment, version_number: str) -> None:
     prep(env, version_number)
-
-
-@cli.command(
-    name="cut", help="Trigger the build process to automate publishing to PyPI"
-)
-@click.pass_obj
-def cut_cmd(env: Environment) -> None:
-    cut(env)
 
 
 @cli.command(name="tag", help="Tag the new release")
 @click.pass_obj
-def tag_cmd(env: Environment) -> None:
+def tag_cmd(env: GitEnvironment) -> None:
     tag(env)
 
 
 @cli.command(name="release", help="Create a new release entry in our GitHub page")
 @click.pass_obj
-def release_cmd(env: Environment) -> None:
+def release_cmd(env: GitEnvironment) -> None:
     release(env)
 
 
