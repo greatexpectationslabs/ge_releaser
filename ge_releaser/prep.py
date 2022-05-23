@@ -1,9 +1,11 @@
 import datetime as dt
+import json
 import logging
 import os
-from typing import List, Tuple, cast
+from typing import Dict, List, Optional, Tuple, cast
 
 import click
+import dateutil.parser
 import git
 from github.Organization import Organization
 from github.PaginatedList import PaginatedList
@@ -23,10 +25,11 @@ from ge_releaser.util import checkout_and_update_develop, parse_deployment_versi
 
 
 def prep(
-    env: GitEnvironment,
-    version_number: str,
+    env: GitEnvironment, version_number: Optional[str], file: Optional[str]
 ) -> None:
     click.secho("[prep]", bold=True, fg="blue")
+
+    version_number = _determine_version_number(version_number, file)
 
     checkout_and_update_develop(env.git_repo)
     current_version, release_version = _parse_versions(version_number)
@@ -57,6 +60,25 @@ def prep(
         fg="green",
     )
     click.echo(f"Link to PR: {url}")
+
+
+def _determine_version_number(
+    version_number: Optional[str], file: Optional[str]
+) -> str:
+    if version_number is not None:
+        return version_number
+
+    assert file is not None  # Invariant that we have either the version or the file
+    with open(file) as f:
+        contents: Dict[str, str] = json.loads(f.read().strip())
+
+    today = dt.datetime.today()
+    for date, version in contents.items():
+        parsed_date: dt.datetime = dateutil.parser.parse(date)
+        if today.date() == parsed_date.date():
+            return version
+
+    raise ValueError("No suitable scheduled release found!")
 
 
 def _parse_versions(version_number: str) -> Tuple[str, str]:

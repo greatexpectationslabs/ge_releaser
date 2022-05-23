@@ -28,10 +28,16 @@ def cli(ctx: click.Context) -> None:
 
 
 @cli.command(name="prep", help="Prepare changelog/release version PR")
-@click.argument("version_number", type=str, nargs=1)
+@click.argument("version_number", type=str, nargs=1, required=False)
+@click.option("--file", "file", type=click.Path(exists=True), required=False)
 @click.pass_obj
-def prep_cmd(env: GitEnvironment, version_number: str) -> None:
-    prep(env, version_number)
+def prep_cmd(
+    env: GitEnvironment, version_number: Optional[str], file: Optional[str]
+) -> None:
+    assert bool(version_number) ^ bool(
+        file
+    ), "You must pass in a version number or point to a scheduler file!"
+    prep(env, version_number, file)
 
 
 @cli.command(name="tag", help="Tag the new release")
