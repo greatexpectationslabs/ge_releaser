@@ -27,7 +27,7 @@ def tag(env: GitEnvironment) -> None:
 
     tag_url: str = os.path.join(RELEASES, "tag", release_version)
     click.secho(
-        f"\n[SUCCESS] Please wait for the build process and PyPI publishing to complete before moving to the `release` cmd.",
+        f"\nPlease wait for the build process and PyPI publishing to complete before moving to the `release` cmd.",
         fg="green",
     )
     click.echo(f"Link to tag: {tag_url}")

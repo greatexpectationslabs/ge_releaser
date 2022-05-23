@@ -1,4 +1,5 @@
 import datetime as dt
+import logging
 import os
 from typing import List, Tuple, cast
 
@@ -106,12 +107,20 @@ def _collect_prs_since_last_release(
         base="develop", state="closed", sort="updated", direction="desc"
     )
     recent_prs: List[PullRequest] = []
+
+    # To ensure we don't accidently exit early, we set a threshold and wait to see a few old PRs before completing iteration
+    counter: int = 0
+    threshold: int = 5
+
     for pr in merged_prs:
-        if not pr.merged or "release" in pr.title.lower():
-            continue
-        # if we're seeing PRs merged more than a week before release, assume we've covered everything
-        if pr.merged_at < (last_release - dt.timedelta(days=7)):
+        if counter >= threshold:
             break
+        if not pr.merged:
+            continue
+
+        logging.info(pr, pr.merged_at, counter)
+        if pr.merged_at < last_release:
+            counter += 1
         if pr.merged_at > last_release:
             recent_prs.append(pr)
 
