@@ -6,6 +6,8 @@ from typing import Dict, List, Tuple
 from github.Organization import Organization
 from github.PullRequest import PullRequest
 
+from ge_releaser.constants import TEAMS
+
 
 class ChangelogCategory(enum.Enum):
     BREAKING = "BREAKING"
@@ -17,6 +19,11 @@ class ChangelogCategory(enum.Enum):
 
 class ChangelogCommit:
     def __init__(self, pr: PullRequest, github_org: Organization) -> None:
+
+        teams: str
+        with open(TEAMS) as f:
+            teams = f.read().strip()
+
         if pr.title[0] == "[":
             try:
                 type_, self.desc = re.match(r"\[([a-zA-Z]+)\] ?(.*)", pr.title).group(
@@ -38,7 +45,7 @@ class ChangelogCommit:
         self.merge_timestamp = pr.merged_at
         self.attribution = (
             f" (thanks @{pr.user.login})"
-            if not github_org.has_in_members(pr.user)
+            if pr.user.login not in teams
             else ""
         )
 
