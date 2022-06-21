@@ -79,13 +79,15 @@ def _determine_version_number(
             version_number = version
             break
 
-    # Ensure we remove the entry from the scheduler file
-    with open(file, "w") as f:
-        contents.pop(today.strftime('%Y-%m-%d'))
-        f.write(json.dumps(contents, indent=4, sort_keys=True))
-
     if version_number is None:
         raise ValueError("No suitable scheduled release found!")
+
+    # Ensure we remove the entry from the scheduler file
+    with open(file, "w") as f:
+        date_to_remove = today.strftime('%Y-%m-%d')
+        contents.pop(date_to_remove)
+        f.write(json.dumps(contents, indent=4, sort_keys=True))
+
     return version_number
 
 
