@@ -68,6 +68,13 @@ def _determine_version_number(
     if version_number is not None:
         return version_number
 
+    version_number = _parse_release_schedule_file(version_number, file)
+    return version_number
+
+
+def _parse_release_schedule_file(
+    version_number: Optional[str], file: Optional[str]
+) -> str:
     assert file is not None  # Invariant that we have either the version or the file
     with open(file) as f:
         contents: Dict[str, str] = json.loads(f.read().strip())
@@ -84,7 +91,7 @@ def _determine_version_number(
 
     # Ensure we remove the entry from the scheduler file
     with open(file, "w") as f:
-        date_to_remove = today.strftime('%Y-%m-%d')
+        date_to_remove = today.strftime("%Y-%m-%d")
         contents.pop(date_to_remove)
         f.write(json.dumps(contents, indent=4, sort_keys=True))
 
