@@ -5,6 +5,7 @@ DEPLOYMENT_VERSION: str = "great_expectations/deployment_version"
 CHANGELOG_MD: str = "docs/changelog.md"
 CHANGELOG_RST: str = "docs_rtd/changelog.rst"
 TEAMS: str = ".github/teams.yml"
+GETTING_STARTED_VERSION: str = "docs/tutorials/getting_started/tutorial_version_snippet.mdx"
 
 GITHUB_REPO: str = "great-expectations/great_expectations"
 AZURE_BUILDS: str = f"https://dev.azure.com/{GITHUB_REPO}/_build?definitionId=1"
