@@ -35,7 +35,7 @@ The tool is designed to do pretty much EVERYTHING for you. Do not run isolated `
   - Authorize it for use with [SAML SSO](https://docs.github.com/en/enterprise-cloud@latest/authentication/authenticating-with-saml-single-sign-on/authorizing-a-personal-access-token-for-use-with-saml-single-sign-on).
   - Save that token with `export GITHUB_TOKEN=...`.
 - Run `ge_releaser prep <release_version>` and get your PR approved and merged - [Loom walkthrough]()
-  - Open azure and run the `great_expectations` pipeline fully (this will be automated in the future)
+  - Open Azure and run the `great_expectations` pipeline fully (this will be automated in the future)
 - Run `ge_releaser tag` and wait for the build to finish - [Loom walkthrough]()
 - Run `ge_releaser release` - [Loom walkthrough]()
 
@@ -47,6 +47,7 @@ The tool is designed to do pretty much EVERYTHING for you. Do not run isolated `
 - Create a new branch from `develop` called `release-X.Y.Z`.
   - Command: `git checkout -b release-X.Y.Z`
 - Update the version in `great_expectations/deployment_version`.
+- Update the version in `docs/tutorials/getting_started/tutorial_version_snippet.mdx`.
 - Add a new entry to `docs/changelog.md` and `docs_rtd/changelog.rst`.
   - Ensure that lines are ordered by: `[BREAKING] | [FEATURE] | [BUGFIX] | [DOCS] | [MAINTENANCE]`
   - Ensure that each line has a reference to its corresponding PR.

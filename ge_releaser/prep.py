@@ -20,6 +20,7 @@ from ge_releaser.constants import (
     CHANGELOG_RST,
     DEPLOYMENT_VERSION,
     PULL_REQUESTS,
+    GETTING_STARTED_VERSION,
 )
 from ge_releaser.util import checkout_and_update_develop, parse_deployment_version_file
 
@@ -37,23 +38,26 @@ def prep(
     release_branch: str = _create_and_checkout_release_branch(
         env.git_repo, release_version
     )
-    click.secho(" * Created a release branch (1/5)", fg="yellow")
+    click.secho(" * Created a release branch (1/6)", fg="yellow")
 
     _update_deployment_version_file(release_version)
-    click.secho(" * Updated deployment version file (2/5)", fg="yellow")
+    click.secho(" * Updated deployment version file (2/6)", fg="yellow")
+
+    _update_getting_started_snippet(release_version)
+    click.secho(" * Updated version in tutorial snippet (3/6)", fg="yellow")
 
     _update_changelogs(
         env.github_org, env.github_repo, current_version, release_version
     )
-    click.secho(" * Updated changelogs (3/5)", fg="yellow")
+    click.secho(" * Updated changelogs (4/6)", fg="yellow")
 
     _commit_changes(env.git_repo)
-    click.secho(" * Committed changes (4/5)", fg="yellow")
+    click.secho(" * Committed changes (5/6)", fg="yellow")
 
     url: str = _create_pr(
         env.git_repo, env.github_repo, release_branch, release_version
     )
-    click.secho(" * Opened prep PR (5/5)", fg="yellow")
+    click.secho(" * Opened prep PR (6/6)", fg="yellow")
 
     click.secho(
         f"\n[SUCCESS] Please review, approve, and merge PR before continuing to `tag` command",
@@ -121,6 +125,17 @@ def _update_deployment_version_file(release_version: str) -> None:
         f.write(f"{release_version.strip()}\n")
 
 
+def _update_getting_started_snippet(release_version: str) -> None:
+    """Creates a `.mdx` file containing the expected output of the CLI command `great_expectations --version` in a
+     markdown codeblock.
+
+    If the .mdx file already exists, it is overwritten when the script runs.
+    """
+    with open(GETTING_STARTED_VERSION, "w") as snippet_file:
+        lines = ("```\n", f"great_expectations, version {release_version}", "\n```")
+        snippet_file.writelines(lines)
+
+
 def _update_changelogs(
     github_org: Organization,
     github_repo: Repository,
@@ -168,7 +183,8 @@ def _collect_prs_since_last_release(
 
 def _commit_changes(git_repo: git.Repo) -> None:
     git_repo.git.add(".")
-    git_repo.git.commit("-m", "release prep")
+    # Bypass pre-commit (if running locally on a dev env)
+    git_repo.git.commit("-m", "release prep", "--no-verify")
 
 
 def _create_pr(
