@@ -21,4 +21,7 @@ FILESYSTEM_CONSTANTS: List[str] = [
 ]
 
 for constant in FILESYSTEM_CONSTANTS:
-    assert os.path.exists(constant)
+    if not os.path.exists(constant):
+        raise ValueError(
+            f"Could not find '{constant}'; are you sure you're in the root of the OSS repo?"
+        )

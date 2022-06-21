@@ -42,7 +42,8 @@ def _tag_release_commit(git_repo: git.Repo, release_version: str) -> None:
 
     commit_to_tag: Optional[Commit] = None
     for commit in commits:
-        if "RELEASE" in str(commit.message):
+        message: str = str(commit.message)
+        if "RELEASE" in message:
             commit_to_tag = commit
             break
 

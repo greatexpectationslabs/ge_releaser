@@ -158,9 +158,7 @@ def _collect_prs_since_last_release(
 
 
 def _commit_changes(git_repo: git.Repo) -> None:
-    git_repo.git.add(DEPLOYMENT_VERSION)
-    git_repo.git.add(CHANGELOG_MD)
-    git_repo.git.add(CHANGELOG_RST)
+    git_repo.git.add(".")
     git_repo.git.commit("-m", "release prep")
 
 
