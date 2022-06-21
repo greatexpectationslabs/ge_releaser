@@ -27,7 +27,7 @@ def cli(ctx: click.Context) -> None:
     ctx.obj = env
 
 
-@cli.command(name="prep", help="Prepare changelogs, release version, and Getting Started in a PR")
+@cli.command(name="prep", help="Prepare changelogs, release version, and Getting Started version in a PR")
 @click.argument("version_number", type=str, nargs=1, required=False)
 @click.option("--file", "file", type=click.Path(exists=True), required=False)
 @click.pass_obj
