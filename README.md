@@ -34,9 +34,10 @@ The tool is designed to do pretty much EVERYTHING for you. Do not run isolated `
   - Create a [personal access GitHub token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token).
   - Authorize it for use with [SAML SSO](https://docs.github.com/en/enterprise-cloud@latest/authentication/authenticating-with-saml-single-sign-on/authorizing-a-personal-access-token-for-use-with-saml-single-sign-on).
   - Save that token with `export GITHUB_TOKEN=...`.
-- Run `qn prep <release_version>` and get your PR approved and merged - [Loom walkthrough]()
-- Run `qn tag` and wait for the build to finish - [Loom walkthrough]()
-- Run `qn release` - [Loom walkthrough]()
+- Run `ge_releaser prep <release_version>` and get your PR approved and merged - [Loom walkthrough]()
+  - Open azure and run the `great_expectations` pipeline fully (this will be automated in the future)
+- Run `ge_releaser tag` and wait for the build to finish - [Loom walkthrough]()
+- Run `ge_releaser release` - [Loom walkthrough]()
 
 ### Manual Process
 
@@ -54,6 +55,7 @@ The tool is designed to do pretty much EVERYTHING for you. Do not run isolated `
   - Command: `git add great_expectations; git commit -m "release prep"; git push`
 - Receive approval and merge the PR.
   - You will have to wait for Azure CI/CD to run its checks.
+  - Open azure and run the `great_expectations` pipeline fully (this will be automated in the future)
 
 #### tag:
 - Create a tag for the new release.
