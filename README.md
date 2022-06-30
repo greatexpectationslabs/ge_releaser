@@ -37,7 +37,7 @@ The tool is designed to do pretty much EVERYTHING for you. Do not run isolated `
 - NOTE: this step is automated so check github for a PR on Thurs morning. If not: Run `ge_releaser prep <release_version>` and get your PR approved and merged - [Loom walkthrough]()
   - Clean up the release PR, currently @Shinnnyshinshin's handle (Will Shin) is not removed by the automated script so manually remove from both changelog.md and changelog.rst 
   - Open Azure and run the `great_expectations` pipeline fully (this will be automated in the future)
-- Run `ge_releaser tag` and wait for the build to finish - [Loom walkthrough]()
+- Run `ge_releaser tag` from the great_expectations repo root and wait for the build to finish - [Loom walkthrough]()
 - Run `ge_releaser release` - [Loom walkthrough]()
 
 ### Manual Process
