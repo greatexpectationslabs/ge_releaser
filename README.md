@@ -29,17 +29,17 @@ The tool is designed to do pretty much EVERYTHING for you. Do not run isolated `
 `ge_releaser` acts as an abstraction on top of our standard manual release process. While the following steps should get you creating releases with ease, it is also important to understand what is happening under the hood. For each of the primary commands that `ge_releaser` offers, the individual manual steps taken by the machine are noted below. Although you shouldn't have to use them, it may be handy if debugging is required.
 
 ### CLI Process
-- Install and setup the tool - [Loom walkthrough]()
+- Install and setup the tool
   - Install the tool using the above instructions.
   - Create a [personal access GitHub token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token).
   - Authorize it for use with [SAML SSO](https://docs.github.com/en/enterprise-cloud@latest/authentication/authenticating-with-saml-single-sign-on/authorizing-a-personal-access-token-for-use-with-saml-single-sign-on).
   - Save that token with `export GITHUB_TOKEN=...`.
-- NOTE: this step is automated so check github for a PR on Thurs morning. If not: Run `ge_releaser prep <release_version>` and approve the auto-generated PR and merge it - [Loom walkthrough]()
+- NOTE: this step is automated so check github for a PR on Thurs morning. If not: Run `ge_releaser prep <release_version>` and approve the auto-generated PR and merge it
   - Message #topic-great_expectations @channel to ask team members to hold off on merging to `develop`
   - Open Azure and run the `great_expectations` pipeline fully (this will be automated in the future)
-- Run `ge_releaser tag` and wait for the build to finish - [Loom walkthrough]()
+- Run `ge_releaser tag` and wait for the build to finish
   - Once the `ge_releaser tag` build has started, you can allow merges to develop while completing the remaining steps.
-- Run `ge_releaser release` - [Loom walkthrough]()
+- Run `ge_releaser release`
 
 ### Manual Process
 
