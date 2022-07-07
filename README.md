@@ -35,7 +35,7 @@ The tool is designed to do pretty much EVERYTHING for you. Do not run isolated `
   - Authorize it for use with [SAML SSO](https://docs.github.com/en/enterprise-cloud@latest/authentication/authenticating-with-saml-single-sign-on/authorizing-a-personal-access-token-for-use-with-saml-single-sign-on).
   - Save that token with `export GITHUB_TOKEN=...`.
 - NOTE: this step is automated so check github for a PR on Thurs morning. If not: Run `ge_releaser prep <release_version>`.
-  - Make sure that there are at least two entries in `release_schedule.json` - one for the next release, and one that will be used as a template after the line for the next release is removed.
+  - Make sure that there is another entry in `release_schedule.json` for the next release.
   - Message #topic-great_expectations @channel to ask team members to hold off on merging to `develop`
   - Approve the auto-generated PR and merge it.
   - Open Azure and run the `great_expectations` pipeline fully (this will be automated in the future)
@@ -59,7 +59,7 @@ The tool is designed to do pretty much EVERYTHING for you. Do not run isolated `
   - Ensure that lines are ordered by: `[BREAKING] | [FEATURE] | [BUGFIX] | [DOCS] | [MAINTENANCE]`
   - Ensure that each line has a reference to its corresponding PR.
   - If coming from an external contributor, make sure the line ends in `(thanks @<contributor_id>)`.
-- Make sure that there are at least two entries in `release_schedule.json` - one for the next release, and one that will be used as a template after the line for the next release is removed.
+- Make sure that there is another entry in `release_schedule.json` for the next release.
 - Commit these three files and create a PR against `develop`.
   - Command: `git add great_expectations; git commit -m "release prep"; git push`
 - Receive approval and merge the PR.
