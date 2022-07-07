@@ -37,8 +37,8 @@ The tool is designed to do pretty much EVERYTHING for you. Do not run isolated `
 - NOTE: this step is automated so check github for a PR on Thurs morning. If not: Run `ge_releaser prep <release_version>` and approve the auto-generated PR and merge it - [Loom walkthrough]()
   - Message #topic-great_expectations @channel to ask team members to hold off on merging to `develop`
   - Open Azure and run the `great_expectations` pipeline fully (this will be automated in the future)
-  - Once the release PR is approved and merged, you can allow merges to develop while completing the following steps.
 - Run `ge_releaser tag` and wait for the build to finish - [Loom walkthrough]()
+  - Once the `ge_releaser tag` build has started, you can allow merges to develop while completing the remaining steps.
 - Run `ge_releaser release` - [Loom walkthrough]()
 
 ### Manual Process
