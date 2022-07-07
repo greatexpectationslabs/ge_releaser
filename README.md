@@ -34,12 +34,17 @@ The tool is designed to do pretty much EVERYTHING for you. Do not run isolated `
   - Create a [personal access GitHub token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token).
   - Authorize it for use with [SAML SSO](https://docs.github.com/en/enterprise-cloud@latest/authentication/authenticating-with-saml-single-sign-on/authorizing-a-personal-access-token-for-use-with-saml-single-sign-on).
   - Save that token with `export GITHUB_TOKEN=...`.
-- NOTE: this step is automated so check github for a PR on Thurs morning. If not: Run `ge_releaser prep <release_version>` and approve the auto-generated PR and merge it
+- NOTE: this step is automated so check github for a PR on Thurs morning. If not: Run `ge_releaser prep <release_version>`.
+  - Make sure that there are at least two entries in `release_schedule.json` - one for the next release, and one that will be used as a template after the line for the next release is removed.
   - Message #topic-great_expectations @channel to ask team members to hold off on merging to `develop`
+  - Approve the auto-generated PR and merge it.
   - Open Azure and run the `great_expectations` pipeline fully (this will be automated in the future)
 - Run `ge_releaser tag` and wait for the build to finish
   - Once the `ge_releaser tag` build has started, you can allow merges to develop while completing the remaining steps.
 - Run `ge_releaser release`
+- Send a draft message (to be reviewed by the team) to #topic-great_expectations, with the message that will be sent in the community Slack.
+- Send the reviewed meesage to the community Slack channel #announcements.
+- Request emoji signal boosting from the team in private Slack channel #topic-great_expectations.
 
 ### Manual Process
 
@@ -54,6 +59,7 @@ The tool is designed to do pretty much EVERYTHING for you. Do not run isolated `
   - Ensure that lines are ordered by: `[BREAKING] | [FEATURE] | [BUGFIX] | [DOCS] | [MAINTENANCE]`
   - Ensure that each line has a reference to its corresponding PR.
   - If coming from an external contributor, make sure the line ends in `(thanks @<contributor_id>)`.
+- Make sure that there are at least two entries in `release_schedule.json` - one for the next release, and one that will be used as a template after the line for the next release is removed.
 - Commit these three files and create a PR against `develop`.
   - Command: `git add great_expectations; git commit -m "release prep"; git push`
 - Receive approval and merge the PR.
@@ -68,3 +74,8 @@ The tool is designed to do pretty much EVERYTHING for you. Do not run isolated `
 
 #### release:
 - Create a release entry in GitHub.
+
+### post-release:
+- Send a draft message (to be reviewed by the team) to #topic-great_expectations, with the message that will be sent in the community Slack.
+- Send the reviewed meesage to the community Slack channel #announcements.
+- Request emoji signal boosting from the team in private Slack channel #topic-great_expectations.
