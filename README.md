@@ -35,7 +35,6 @@ The tool is designed to do pretty much EVERYTHING for you. Do not run isolated `
   - Authorize it for use with [SAML SSO](https://docs.github.com/en/enterprise-cloud@latest/authentication/authenticating-with-saml-single-sign-on/authorizing-a-personal-access-token-for-use-with-saml-single-sign-on).
   - Save that token with `export GITHUB_TOKEN=...`.
 - NOTE: this step is automated so check github for a PR on Thurs morning. If not: Run `ge_releaser prep <release_version>` and get your PR approved and merged - [Loom walkthrough]()
-  - Clean up the release PR, currently @Shinnnyshinshin's handle (Will Shin) is not removed by the automated script so manually remove from both changelog.md and changelog.rst 
   - Open Azure and run the `great_expectations` pipeline fully (this will be automated in the future)
 - Run `ge_releaser tag` and wait for the build to finish - [Loom walkthrough]()
 - Run `ge_releaser release` - [Loom walkthrough]()
