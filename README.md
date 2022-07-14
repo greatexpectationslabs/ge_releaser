@@ -37,8 +37,8 @@ The tool is designed to do pretty much EVERYTHING for you. Do not run isolated `
 - NOTE: this step is automated so check github for a PR on Thurs morning. If not: Run `ge_releaser prep <release_version>`.
   - Make sure that there is another entry in `release_schedule.json` for the next release.
   - Message #topic-great_expectations @channel to ask team members to hold off on merging to `develop`
-  - Approve the auto-generated PR and merge it.
   - Open Azure and run the `great_expectations` pipeline fully (this will be automated in the future)
+  - Approve the auto-generated PR and merge it.
 - Run `ge_releaser tag` and wait for the build to finish
   - Once the `ge_releaser tag` build has started, you can allow merges to develop while completing the remaining steps.
 - Run `ge_releaser release`
