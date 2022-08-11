@@ -34,16 +34,28 @@ The tool is designed to do pretty much EVERYTHING for you. Do not run isolated `
   - Create a [personal access GitHub token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token).
   - Authorize it for use with [SAML SSO](https://docs.github.com/en/enterprise-cloud@latest/authentication/authenticating-with-saml-single-sign-on/authorizing-a-personal-access-token-for-use-with-saml-single-sign-on).
   - Save that token with `export GITHUB_TOKEN=...`.
-- NOTE: this step is automated so check github for a PR on Thurs morning. If not: Run `ge_releaser prep <release_version>`.
-  - Make sure that there is another entry in `release_schedule.json` for the next release.
+- Test the release candidate
   - Message #topic-great_expectations @channel to ask team members to hold off on merging to `develop`
-  - Open Azure and run the `great_expectations` pipeline fully (this will be automated in the future)
+  - Look for a release PR on github. It will be named `[RELEASE] <RELEASE_NUMBER>`, eg `[RELEASE] 0.15.18`.
+    - If none is present run: `ge_releaser prep <release_version>`
+  - Before running tests on the release candidate you will want to check that the last automated build is passing. 
+    - If it is not, testing the release will likely not go through successfully. 
+    - The slack channel #notifications-great_expectations surfaces failures.
+    - The automated pipeline can be viewed on our [pipeline page](https://dev.azure.com/great-expectations/great_expectations/_build?definitionId=1). Search for lines like `Scheduled for ... develop`
+  - If there were errors or if you need to add any PRs to the build you will need to update the release notes.
+    - The release notes are at `/docs/changelog.md` and `/docs_rtd/changelog.rst`. The `.rst` file is a legacy file but needs to be kept up to date for the time being.
+    - These release note lines are commit messages. You can run `git log` if you want to add new ones. The files are organized by type, then chronologically. If there is no type on a commit message, prepend `[MAINTENANCE]`
+  - Make sure that there is an entry in `release_schedule.json` for the next release.
   - Approve the auto-generated PR and merge it.
-- Run `ge_releaser tag` and wait for the build to finish
-  - Once the `ge_releaser tag` build has started, you can allow merges to develop while completing the remaining steps. This is done by messaging the #topic-great_expectations channel.
+  - Open Azure and run the `great_expectations` pipeline fully (this will be automated in the future)
+- Run `ge_releaser tag` and wait for the azure pipeline to finish
+  - Once the `ge_releaser tag` build has started, you can allow merges to develop while completing the remaining steps. This is done my messaging the #topic-great_expectations channel.
 - Run `ge_releaser release`
 - Send a draft message (to be reviewed by the team) to #topic-great_expectations, with the message that will be sent in the community Slack.
-- Send the reviewed meesage to the community Slack channel #announcements.
+  - When you call out contributors, use there slack handle: @\<slack username\>
+  - If no slack handle is present go to github and look at their user profile: https://github.com/<username> and then use "Real name (\<github username\>)":
+  - If they have no real name, use their github handle: "\<github username\>"
+- Send the reviewed message to the community Slack channel #announcements.
 - Request emoji signal boosting from the team in private Slack channel #topic-great_expectations.
 
 ### Manual Process
