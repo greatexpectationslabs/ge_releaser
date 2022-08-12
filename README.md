@@ -5,6 +5,15 @@ A CLI tool built to streamline the process of cutting releases each week in the 
 ---
 
 ## Installation
+
+#### Reccomended [method via `pipx`](https://pypa.github.io/pipx/)
+
+```bash
+pipx install git+https://github.com/superconductive/ge_releaser
+```
+
+#### Alternate method
+
 ```bash
 # Preferably run all this in a venv
 git clone git@github.com:superconductive/ge_releaser.git
