@@ -44,7 +44,7 @@ The tool is designed to do pretty much EVERYTHING for you. Do not run isolated `
     - The automated pipeline can be viewed on our [pipeline page](https://dev.azure.com/great-expectations/great_expectations/_build?definitionId=1). Search for lines like `Scheduled for ... develop`
   - If there were errors or if you need to add any PRs to the build you will need to update the release notes.
     - The release notes are at `/docs/changelog.md` and `/docs_rtd/changelog.rst`. The `.rst` file is a legacy file but needs to be kept up to date for the time being.
-    - These release note lines are commit messages. You can run `git log` if you want to add new ones. The files are organized by type, then chronologically. If there is no type on a commit message, prepend `[MAINTENANCE]`
+    - These release note lines are commit messages. You can run `git log --oneline` if you want to add new ones. The files are organized by type, then chronologically. If there is no type on a commit message, prepend `[MAINTENANCE]`
   - Make sure that there is an entry in `release_schedule.json` for the next release.
   - Approve the auto-generated PR and merge it.
   - Open Azure and run the `great_expectations` pipeline fully (this will be automated in the future)
