@@ -46,8 +46,9 @@ The tool is designed to do pretty much EVERYTHING for you. Do not run isolated `
     - The release notes are at `/docs/changelog.md` and `/docs_rtd/changelog.rst`. The `.rst` file is a legacy file but needs to be kept up to date for the time being.
     - These release note lines are commit messages. You can run `git log` if you want to add new ones. The files are organized by type, then chronologically. If there is no type on a commit message, prepend `[MAINTENANCE]`
   - Make sure that there is an entry in `release_schedule.json` for the next release.
-  - Approve the auto-generated PR and merge it.
-  - Open Azure and run the `great_expectations` pipeline fully (this will be automated in the future)
+  - Approve the auto-generated PR.
+  - Open Azure and run the `great_expectations` pipeline fully (this will be automated in the future). Here is a [video description of this step](https://www.loom.com/share/2da11fadc7df4fbb80c55384b7729c24).
+  - Merge the auto-generated PR after all tests pass.
 - Run `ge_releaser tag` and wait for the azure pipeline to finish
   - Once the `ge_releaser tag` build has started, you can allow merges to develop while completing the remaining steps. This is done my messaging the #topic-great_expectations channel.
 - Run `ge_releaser release`
