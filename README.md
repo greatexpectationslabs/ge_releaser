@@ -50,7 +50,7 @@ The tool is designed to do pretty much EVERYTHING for you. Do not run isolated `
   - Open Azure and run the `great_expectations` pipeline fully (this will be automated in the future). Here is a [video description of this step](https://www.loom.com/share/2da11fadc7df4fbb80c55384b7729c24).
   - Merge the auto-generated PR after all tests pass.
 - Run `ge_releaser tag` and wait for the azure pipeline to finish
-  - Once the `ge_releaser tag` build has started, you can allow merges to develop while completing the remaining steps. This is done my messaging the #topic-great_expectations channel.
+  - Once the `ge_releaser tag` build has finished with all tests passing, you can allow merges to develop while completing the remaining steps. This is done my messaging the #topic-great_expectations channel.
 - Run `ge_releaser release`
 - Send a draft message (to be reviewed by the team) to #topic-great_expectations, with the message that will be sent in the community Slack.
   - When you call out contributors, use there slack handle: @\<slack username\>
