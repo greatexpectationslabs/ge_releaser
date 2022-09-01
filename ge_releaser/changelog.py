@@ -86,6 +86,7 @@ class ChangelogEntry:
         for i, line in enumerate(contents):
             if current_version in line:
                 insertion_point = i - 1
+                break
 
         assert (
             insertion_point > 0
