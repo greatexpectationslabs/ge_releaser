@@ -38,7 +38,7 @@ The tool is designed to do pretty much EVERYTHING for you. Do not run isolated `
   - Save that token with `export GITHUB_TOKEN=...`.
 - Test the release candidate
   - Message #topic-great_expectations @channel to ask team members to hold off on merging to `develop`
-  - Look for a release PR on github. It will be named `[RELEASE] <RELEASE_NUMBER>`, eg `[RELEASE] 0.15.18`.  Please note that oftentimes this release PR is created automatically hours ahead of the present steps being carried out.  This means that the working branch of the release PR may be out of date.  In this case, when `develop` is reliably frozen, please update this working branch (in GitHub).
+  - Look for a release PR on github. It will be named `[RELEASE] <RELEASE_NUMBER>`, eg `[RELEASE] 0.15.18`.  Please note that oftentimes this release PR is created automatically hours ahead of the present steps being carried out.  This means that the working branch of the release PR may be out of date.  In this case, when `develop` is reliably frozen, update this working branch.
     - If none is present run: `ge_releaser prep <release_version>`
   - Before running tests on the release candidate you will want to check that the last automated build is passing. 
     - If it is not, testing the release will likely not go through successfully. 
