@@ -34,7 +34,7 @@ The tool is designed to do pretty much EVERYTHING for you. Do not run isolated `
 - Install and setup the tool
   - Install the tool using the above instructions.
   - Create a [personal access GitHub token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token), unless you already have one.
-  - Authorize it for use with [SAML SSO](https://docs.github.com/en/enterprise-cloud@latest/authentication/authenticating-with-saml-single-sign-on/authorizing-a-personal-access-token-for-use-with-saml-single-sign-on).
+  - Authorize it for use with [SAML SSO](https://docs.github.com/en/enterprise-cloud@latest/authentication/authenticating-with-saml-single-sign-on/authorizing-a-personal-access-token-for-use-with-saml-single-sign-on), unless this has already been done previously.
   - Save that token with `export GITHUB_TOKEN=...`.
 - Test the release candidate
   - Message #topic-great_expectations @channel to ask team members to hold off on merging to `develop`
