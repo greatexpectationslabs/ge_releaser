@@ -13,6 +13,8 @@ pip install -e .
 ```
 
 ## Commands
+These commands are to be executed in Great Expectations development directory (be sure to check out the `develop` branch).
+
 ```bash
 # Commands are meant to be run sequentially
 ge_releaser prep 0.15.2  # Modify changelogs and open a PR.
@@ -31,12 +33,12 @@ The tool is designed to do pretty much EVERYTHING for you. Do not run isolated `
 ### CLI Process
 - Install and setup the tool
   - Install the tool using the above instructions.
-  - Create a [personal access GitHub token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token).
+  - Create a [personal access GitHub token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token), unless you already have one.
   - Authorize it for use with [SAML SSO](https://docs.github.com/en/enterprise-cloud@latest/authentication/authenticating-with-saml-single-sign-on/authorizing-a-personal-access-token-for-use-with-saml-single-sign-on).
   - Save that token with `export GITHUB_TOKEN=...`.
 - Test the release candidate
   - Message #topic-great_expectations @channel to ask team members to hold off on merging to `develop`
-  - Look for a release PR on github. It will be named `[RELEASE] <RELEASE_NUMBER>`, eg `[RELEASE] 0.15.18`.
+  - Look for a release PR on github. It will be named `[RELEASE] <RELEASE_NUMBER>`, eg `[RELEASE] 0.15.18`.  Please note that oftentimes this release PR is created automatically hours ahead of the present steps being carried out.  This means that the working branch of the release PR may be out of date.  In this case, when `develop` is reliably frozen, please update this working branch (in GitHub).
     - If none is present run: `ge_releaser prep <release_version>`
   - Before running tests on the release candidate you will want to check that the last automated build is passing. 
     - If it is not, testing the release will likely not go through successfully. 
