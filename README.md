@@ -12,6 +12,15 @@ cd ge_releaser
 pip install -e .
 ```
 
+```bash
+# Alternative
+gh repo clone superconductive/ge_releaser
+cd ge_releaser
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -e .
+```
+
 ## Commands
 These commands are to be executed in Great Expectations development directory (be sure to check out the `develop` branch).
 
