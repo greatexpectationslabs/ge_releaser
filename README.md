@@ -92,7 +92,7 @@ The tool is designed to do pretty much EVERYTHING for you. Do not run isolated `
 #### publish:
 - Create a release entry in GitHub.
 
-### post-release:
+#### post-release:
 - Send a draft message (to be reviewed by the team) to `#topic-great_expectations`, with the message that will be sent in the community Slack.
 - Send the reviewed meesage to the community Slack channel `#announcements`.
 - Request emoji signal boosting from the team in private Slack channel `#topic-great_expectations`.
