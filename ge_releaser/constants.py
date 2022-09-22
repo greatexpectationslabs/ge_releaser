@@ -22,7 +22,7 @@ class GxFile(str, enum.Enum):
     )
 
 
-def check_if_in_gx_root():
+def check_if_in_gx_root() -> None:
     for constant in GxFile:
         if not os.path.exists(constant):
             raise ValueError(
