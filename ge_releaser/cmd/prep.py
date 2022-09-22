@@ -5,7 +5,6 @@ from typing import List, Tuple
 
 import click
 import git
-from github.Organization import Organization
 from github.PaginatedList import PaginatedList
 from github.PullRequest import PullRequest
 from github.Repository import Repository
@@ -13,13 +12,11 @@ from packaging import version
 
 from ge_releaser.changelog import ChangelogEntry
 from ge_releaser.cli import GitEnvironment
-from ge_releaser.constants import GxFile, GxURL
 from ge_releaser.cmd.util import checkout_and_update_develop
+from ge_releaser.constants import GxFile, GxURL
 
 
-def prep(
-    env: GitEnvironment
-) -> None:
+def prep(env: GitEnvironment) -> None:
     click.secho("[prep]", bold=True, fg="blue")
 
     last_version, release_version = _parse_versions(env.git_repo)
@@ -37,9 +34,7 @@ def prep(
     _update_getting_started_snippet(release_version)
     click.secho(" * Updated version in tutorial snippet (3/6)", fg="yellow")
 
-    _update_changelogs(
-        env.github_org, env.github_repo, last_version, release_version
-    )
+    _update_changelogs(env.github_repo, last_version, release_version)
     click.secho(" * Updated changelogs (4/6)", fg="yellow")
 
     _commit_changes(env.git_repo)
@@ -63,9 +58,6 @@ def _parse_versions(
     assert release_version > last_version, "Version provided to command is not valid"
 
     return str(last_version), str(release_version)
-
-
-
 
 
 def _create_and_checkout_release_branch(
@@ -93,26 +85,28 @@ def _update_getting_started_snippet(release_version: str) -> None:
 
 
 def _update_changelogs(
-    github_org: Organization,
     github_repo: Repository,
-    current_version: str,
+    last_version: str,
     release_version: str,
 ) -> None:
     relevant_prs: List[PullRequest] = _collect_prs_since_last_release(
-        github_repo, current_version
+        github_repo, last_version, release_version
     )
 
-    changelog_entry: ChangelogEntry = ChangelogEntry(github_org, relevant_prs)
+    changelog_entry: ChangelogEntry = ChangelogEntry(relevant_prs)
 
-    changelog_entry.write(GxFile.CHANGELOG_MD, current_version, release_version)
-    changelog_entry.write(GxFile.CHANGELOG_RST, current_version, release_version)
+    changelog_entry.write(GxFile.CHANGELOG_MD, last_version, release_version)
+    changelog_entry.write(GxFile.CHANGELOG_RST, last_version, release_version)
 
 
 def _collect_prs_since_last_release(
     github_repo: Repository,
-    current_version: str,
+    last_version: str,
+    release_version: str,
 ) -> List[PullRequest]:
-    last_release: dt.datetime = github_repo.get_release(current_version).created_at
+    last_release: dt.datetime = github_repo.get_release(last_version).created_at
+    curr_release: dt.datetime = github_repo.get_release(release_version).created_at
+
     merged_prs: PaginatedList[PullRequest] = github_repo.get_pulls(
         base="develop", state="closed", sort="updated", direction="desc"
     )
@@ -131,7 +125,7 @@ def _collect_prs_since_last_release(
         logging.info(pr, pr.merged_at, counter)
         if pr.merged_at < last_release:
             counter += 1
-        if pr.merged_at > last_release:
+        if pr.merged_at > last_release and pr.merged_at < curr_release:
             recent_prs.append(pr)
 
     return recent_prs
@@ -159,6 +153,7 @@ def _create_pr(
     )
 
     return os.path.join(GxURL.PULL_REQUESTS, str(pr.number))
+
 
 def _print_next_steps(url: str) -> None:
     click.secho(

@@ -1,7 +1,7 @@
 import datetime as dt
 import enum
 import re
-from typing import Dict, List, Tuple
+from typing import Callable, Dict, List, Tuple
 
 from github.PullRequest import PullRequest
 
@@ -91,16 +91,17 @@ class ChangelogEntry:
             insertion_point > 0
         ), "Could not find appropriate insertion point for new changelog entry"
 
+        render_fn: Callable[[str], List[str]]
         if outfile.endswith(".md"):
-            contents[insertion_point:insertion_point] = self._render_to_md(
-                release_version
-            )
+            render_fn = self._render_to_md
         elif outfile.endswith(".rst"):
-            contents[insertion_point:insertion_point] = self._render_to_rst(
-                release_version
-            )
+            render_fn = self._render_to_rst
         else:
-            raise Exception()
+            raise ValueError("Invalid file type!")
+
+        contents[insertion_point:insertion_point] = render_fn(
+            release_version
+        )
 
         with open(outfile, "w") as f:
             f.writelines(contents)
