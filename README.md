@@ -40,22 +40,22 @@ The tool is designed to do pretty much EVERYTHING for you. Do not run isolated `
 `ge_releaser` acts as an abstraction on top of our standard manual release process. While the following steps should get you creating releases with ease, it is also important to understand what is happening under the hood. For each of the primary commands that `ge_releaser` offers, the individual manual steps taken by the machine are noted below. Although you shouldn't have to use them, it may be handy if debugging is required.
 
 ### CLI Process
-1. Install and setup the tool
+- Install and setup the tool
   - Install the tool using the above instructions.
   - Create a [personal access GitHub token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token), unless you already have one.
   - Authorize it for use with [SAML SSO](https://docs.github.com/en/enterprise-cloud@latest/authentication/authenticating-with-saml-single-sign-on/authorizing-a-personal-access-token-for-use-with-saml-single-sign-on), unless this has already been done previously.
   - Save that token with `export GITHUB_TOKEN=...`.
-2. Run `ge_releaser tag <commit_hash> <release_version>`.
+- Run `ge_releaser tag <commit_hash> <release_version>`.
   - This will tag that particular commit with your desired release SemVer.
   - Wait until the Azure pipeline finishes running and confirm proper publishing to PyPI.
-3. Run `ge_releaser prep`.
+- Run `ge_releaser prep`.
   - This will generate changelogs, update relevant files, and draft a PR titled `[RELEASE] <RELEASE_NUMBER>`.
   - Review the contents of this PR and ensure it looks appropriate before merging.
     - Check that the new changelog entry only contains changes that have transpired between the last release and this current one.
     - Additionally, ensure that any external contributors recieve attribution for their efforts.
-4. Run `ge_releaser publish`.
+- Run `ge_releaser publish`.
   - This command will take the changelog notes generated from the previous step and write them to our GitHub Releases page.
-5. Draft a message to the community and send it in the OSS Slack channel.
+- Draft a message to the community and send it in the OSS Slack channel.
   - To make sure the message is appropriate, draft an announcement and have the team review it in `#topic-great_expectations`.
     - When you call out contributors, use there slack handle: @\<slack username\>
     - If no slack handle is present go to github and look at their user profile: https://github.com/<username> and then use "Real name (\<github username\>)":
