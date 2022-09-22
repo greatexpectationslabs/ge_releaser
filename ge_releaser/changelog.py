@@ -3,10 +3,9 @@ import enum
 import re
 from typing import Dict, List, Tuple
 
-from github.Organization import Organization
 from github.PullRequest import PullRequest
 
-from ge_releaser.constants import TEAMS
+from ge_releaser.constants import GxFile
 
 
 class ChangelogCategory(enum.Enum):
@@ -18,10 +17,10 @@ class ChangelogCategory(enum.Enum):
 
 
 class ChangelogCommit:
-    def __init__(self, pr: PullRequest, github_org: Organization) -> None:
+    def __init__(self, pr: PullRequest) -> None:
 
         teams: str
-        with open(TEAMS) as f:
+        with open(GxFile.TEAMS) as f:
             teams = f.read().strip()
 
         if pr.title[0] == "[":
@@ -63,11 +62,11 @@ class ChangelogCommit:
 
 class ChangelogEntry:
     def __init__(
-        self, github_org: Organization, pull_requests: List[PullRequest]
+        self, pull_requests: List[PullRequest]
     ) -> None:
         changelog_commits: List[ChangelogCommit] = []
         for pr in pull_requests:
-            changelog_commit: ChangelogCommit = ChangelogCommit(pr, github_org)
+            changelog_commit: ChangelogCommit = ChangelogCommit(pr)
             changelog_commits.append(changelog_commit)
 
         changelog_commits.sort(key=ChangelogCommit.sort_key)

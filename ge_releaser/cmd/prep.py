@@ -1,11 +1,9 @@
 import datetime as dt
-import json
 import logging
 import os
-from typing import Dict, List, Optional, Tuple, cast
+from typing import List, Tuple
 
 import click
-import dateutil.parser
 import git
 from github.Organization import Organization
 from github.PaginatedList import PaginatedList
@@ -15,25 +13,18 @@ from packaging import version
 
 from ge_releaser.changelog import ChangelogEntry
 from ge_releaser.cli import GitEnvironment
-from ge_releaser.constants import (
-    CHANGELOG_MD,
-    CHANGELOG_RST,
-    DEPLOYMENT_VERSION,
-    PULL_REQUESTS,
-    GETTING_STARTED_VERSION,
-)
-from ge_releaser.util import checkout_and_update_develop, parse_deployment_version_file
+from ge_releaser.constants import GxFile, GxURL
+from ge_releaser.cmd.util import checkout_and_update_develop
 
 
 def prep(
-    env: GitEnvironment, version_number: Optional[str], file: Optional[str]
+    env: GitEnvironment
 ) -> None:
     click.secho("[prep]", bold=True, fg="blue")
 
-    version_number = _determine_version_number(version_number, file)
+    last_version, release_version = _parse_versions(env.git_repo)
 
     checkout_and_update_develop(env.git_repo)
-    current_version, release_version = _parse_versions(version_number)
 
     release_branch: str = _create_and_checkout_release_branch(
         env.git_repo, release_version
@@ -47,7 +38,7 @@ def prep(
     click.secho(" * Updated version in tutorial snippet (3/6)", fg="yellow")
 
     _update_changelogs(
-        env.github_org, env.github_repo, current_version, release_version
+        env.github_org, env.github_repo, last_version, release_version
     )
     click.secho(" * Updated changelogs (4/6)", fg="yellow")
 
@@ -59,57 +50,22 @@ def prep(
     )
     click.secho(" * Opened prep PR (6/6)", fg="yellow")
 
-    click.secho(
-        f"\n[SUCCESS] Please review, approve, and merge PR before continuing to `tag` command",
-        fg="green",
-    )
-    click.echo(f"Link to PR: {url}")
+    _print_next_steps(url)
 
 
-def _determine_version_number(
-    version_number: Optional[str], file: Optional[str]
-) -> str:
-    if version_number is not None:
-        return version_number
+def _parse_versions(
+    git_repo: git.Repo,
+) -> Tuple[str, str]:
+    tags = sorted(git_repo.tags, key=lambda t: t.commit.committed_datetime)
+    release_version = version.parse(str(tags[-1]))
+    last_version = version.parse(str(tags[-2]))
 
-    version_number = _parse_release_schedule_file(version_number, file)
-    return version_number
+    assert release_version > last_version, "Version provided to command is not valid"
 
-
-def _parse_release_schedule_file(
-    version_number: Optional[str], file: Optional[str]
-) -> str:
-    assert file is not None  # Invariant that we have either the version or the file
-    with open(file) as f:
-        contents: Dict[str, str] = json.loads(f.read().strip())
-
-    today = dt.datetime.today()
-    for date, version in contents.items():
-        parsed_date: dt.datetime = dateutil.parser.parse(date)
-        if today.date() == parsed_date.date():
-            version_number = version
-            break
-
-    if version_number is None:
-        raise ValueError("No suitable scheduled release found!")
-
-    # Ensure we remove the entry from the scheduler file
-    with open(file, "w") as f:
-        date_to_remove = today.strftime("%Y-%m-%d")
-        contents.pop(date_to_remove)
-        f.write(json.dumps(contents, indent=4, sort_keys=True))
-
-    return version_number
+    return str(last_version), str(release_version)
 
 
-def _parse_versions(version_number: str) -> Tuple[str, str]:
-    current_version: version.Version = parse_deployment_version_file()
-    release_version: version.Version = cast(
-        version.Version, version.parse(version_number)
-    )
-    assert release_version > current_version, "Version provided to command is not valid"
 
-    return str(current_version), str(release_version)
 
 
 def _create_and_checkout_release_branch(
@@ -121,7 +77,7 @@ def _create_and_checkout_release_branch(
 
 
 def _update_deployment_version_file(release_version: str) -> None:
-    with open(DEPLOYMENT_VERSION, "w") as f:
+    with open(GxFile.DEPLOYMENT_VERSION, "w") as f:
         f.write(f"{release_version.strip()}\n")
 
 
@@ -131,7 +87,7 @@ def _update_getting_started_snippet(release_version: str) -> None:
 
     If the .mdx file already exists, it is overwritten when the script runs.
     """
-    with open(GETTING_STARTED_VERSION, "w") as snippet_file:
+    with open(GxFile.GETTING_STARTED_VERSION, "w") as snippet_file:
         lines = ("```\n", f"great_expectations, version {release_version}", "\n```")
         snippet_file.writelines(lines)
 
@@ -148,8 +104,8 @@ def _update_changelogs(
 
     changelog_entry: ChangelogEntry = ChangelogEntry(github_org, relevant_prs)
 
-    changelog_entry.write(CHANGELOG_MD, current_version, release_version)
-    changelog_entry.write(CHANGELOG_RST, current_version, release_version)
+    changelog_entry.write(GxFile.CHANGELOG_MD, current_version, release_version)
+    changelog_entry.write(GxFile.CHANGELOG_RST, current_version, release_version)
 
 
 def _collect_prs_since_last_release(
@@ -202,4 +158,11 @@ def _create_pr(
         base="develop",
     )
 
-    return os.path.join(PULL_REQUESTS, str(pr.number))
+    return os.path.join(GxURL.PULL_REQUESTS, str(pr.number))
+
+def _print_next_steps(url: str) -> None:
+    click.secho(
+        f"\n[SUCCESS] Please review, approve, and merge PR before continuing to `tag` command",
+        fg="green",
+    )
+    click.echo(f"Link to PR: {url}")
