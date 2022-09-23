@@ -53,6 +53,7 @@ The tool is designed to do pretty much EVERYTHING for you. Do not run isolated `
   - Review the contents of this PR and ensure it looks appropriate before merging.
     - Check that the new changelog entry only contains changes that have transpired between the last release and this current one.
     - Additionally, ensure that any external contributors recieve attribution for their efforts.
+    - NOTE: This process may include some additional entries (if the release commit selected is before HEAD). If so, please remove them to ensure an accurate changelog.
 - Run `ge_releaser publish`.
   - This command will take the changelog notes generated from the previous step and write them to our GitHub Releases page.
 - Draft a message to the community and send it in the OSS Slack channel.
