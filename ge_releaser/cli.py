@@ -3,11 +3,11 @@ from typing import Optional
 
 import click
 
-from ge_releaser.constants import GITHUB_REPO
+from ge_releaser.constants import GITHUB_REPO, check_if_in_gx_root
 from ge_releaser.git import GitEnvironment
-from ge_releaser.prep import prep
-from ge_releaser.release import release
-from ge_releaser.tag import tag
+from ge_releaser.cmd.prep import prep
+from ge_releaser.cmd.publish import publish
+from ge_releaser.cmd.tag import tag
 
 
 @click.group()
@@ -16,40 +16,42 @@ def cli(ctx: click.Context) -> None:
     """
     A set of utilities to aid with the Great Expectations release process!
 
-    These are meant to be run sequentially: prep | cut | tag | release
+    These are meant to be run sequentially: tag | prep | publish
 
     Please run `<command> help` for more specific details.
     """
     token: Optional[str] = os.environ.get("GITHUB_TOKEN")
     assert token is not None, "Must set GITHUB_TOKEN environment variable!"
 
+    check_if_in_gx_root()
+
     env: GitEnvironment = GitEnvironment(token, GITHUB_REPO)
     ctx.obj = env
 
 
-@cli.command(name="prep", help="Prepare changelogs, release version, and Getting Started version in a PR")
-@click.argument("version_number", type=str, nargs=1, required=False)
-@click.option("--file", "file", type=click.Path(exists=True), required=False)
+@cli.command(name="tag", help="Tag the new release")
+@click.argument("commit", type=str, nargs=1, required=True)
+@click.argument("version_number", type=str, nargs=1, required=True)
+@click.pass_obj
+def tag_cmd(env: GitEnvironment, commit: str, version_number: str) -> None:
+    tag(env=env, commit=commit, version_number=version_number)
+
+
+@cli.command(
+    name="prep",
+    help="Prepare changelogs, release version, and Getting Started version in a PR",
+)
 @click.pass_obj
 def prep_cmd(
-    env: GitEnvironment, version_number: Optional[str], file: Optional[str]
+    env: GitEnvironment
 ) -> None:
-    assert bool(version_number) ^ bool(
-        file
-    ), "You must pass in a version number or point to a scheduler file!"
-    prep(env, version_number, file)
+    prep(env=env)
 
 
-@cli.command(name="tag", help="Tag the new release")
+@cli.command(name="publish", help="Publish a new release entry in our GitHub page")
 @click.pass_obj
-def tag_cmd(env: GitEnvironment) -> None:
-    tag(env)
-
-
-@cli.command(name="release", help="Create a new release entry in our GitHub page")
-@click.pass_obj
-def release_cmd(env: GitEnvironment) -> None:
-    release(env)
+def publish_cmd(env: GitEnvironment) -> None:
+    publish(env=env)
 
 
 if __name__ == "__main__":

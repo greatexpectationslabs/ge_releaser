@@ -1,12 +1,11 @@
 import datetime as dt
 import enum
 import re
-from typing import Dict, List, Tuple
+from typing import Callable, Dict, List, Tuple
 
-from github.Organization import Organization
 from github.PullRequest import PullRequest
 
-from ge_releaser.constants import TEAMS
+from ge_releaser.constants import GxFile
 
 
 class ChangelogCategory(enum.Enum):
@@ -18,10 +17,10 @@ class ChangelogCategory(enum.Enum):
 
 
 class ChangelogCommit:
-    def __init__(self, pr: PullRequest, github_org: Organization) -> None:
+    def __init__(self, pr: PullRequest) -> None:
 
         teams: str
-        with open(TEAMS) as f:
+        with open(GxFile.TEAMS) as f:
             teams = f.read().strip()
 
         if pr.title[0] == "[":
@@ -63,11 +62,11 @@ class ChangelogCommit:
 
 class ChangelogEntry:
     def __init__(
-        self, github_org: Organization, pull_requests: List[PullRequest]
+        self, pull_requests: List[PullRequest]
     ) -> None:
         changelog_commits: List[ChangelogCommit] = []
         for pr in pull_requests:
-            changelog_commit: ChangelogCommit = ChangelogCommit(pr, github_org)
+            changelog_commit: ChangelogCommit = ChangelogCommit(pr)
             changelog_commits.append(changelog_commit)
 
         changelog_commits.sort(key=ChangelogCommit.sort_key)
@@ -92,16 +91,17 @@ class ChangelogEntry:
             insertion_point > 0
         ), "Could not find appropriate insertion point for new changelog entry"
 
+        render_fn: Callable[[str], List[str]]
         if outfile.endswith(".md"):
-            contents[insertion_point:insertion_point] = self._render_to_md(
-                release_version
-            )
+            render_fn = self._render_to_md
         elif outfile.endswith(".rst"):
-            contents[insertion_point:insertion_point] = self._render_to_rst(
-                release_version
-            )
+            render_fn = self._render_to_rst
         else:
-            raise Exception()
+            raise ValueError("Invalid file type!")
+
+        contents[insertion_point:insertion_point] = render_fn(
+            release_version
+        )
 
         with open(outfile, "w") as f:
             f.writelines(contents)

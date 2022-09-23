@@ -3,7 +3,7 @@ from typing import cast
 import git
 from packaging import version
 
-from ge_releaser.constants import DEPLOYMENT_VERSION
+from ge_releaser.constants import GxFile
 
 
 def checkout_and_update_develop(git_repo: git.Repo) -> None:
@@ -12,7 +12,7 @@ def checkout_and_update_develop(git_repo: git.Repo) -> None:
 
 
 def parse_deployment_version_file() -> version.Version:
-    with open(DEPLOYMENT_VERSION) as f:
+    with open(GxFile.DEPLOYMENT_VERSION) as f:
         contents: str = str(f.read()).strip()
         current_version = cast(version.Version, version.parse(contents))
 
