@@ -90,7 +90,7 @@ def _update_changelogs(
     release_version: str,
 ) -> None:
     relevant_prs: List[PullRequest] = _collect_prs_since_last_release(
-        github_repo, last_version, release_version
+        github_repo, last_version
     )
 
     changelog_entry: ChangelogEntry = ChangelogEntry(relevant_prs)
@@ -102,10 +102,11 @@ def _update_changelogs(
 def _collect_prs_since_last_release(
     github_repo: Repository,
     last_version: str,
-    release_version: str,
 ) -> List[PullRequest]:
+    # 20220923 - Chetan - Currently, this grabs all PRs from the last release until the moment of program execution.
+    # This should be updated so the changelog generation stops once it hits the release commit.
+
     last_release: dt.datetime = github_repo.get_release(last_version).created_at
-    curr_release: dt.datetime = github_repo.get_release(release_version).created_at
 
     merged_prs: PaginatedList[PullRequest] = github_repo.get_pulls(
         base="develop", state="closed", sort="updated", direction="desc"
@@ -119,13 +120,15 @@ def _collect_prs_since_last_release(
     for pr in merged_prs:
         if counter >= threshold:
             break
-        if not pr.merged:
+
+        # Ignore closed PRs and any release-specific PRs
+        if not pr.merged or "RELEASE" in pr.title:
             continue
 
         logging.info(pr, pr.merged_at, counter)
         if pr.merged_at < last_release:
             counter += 1
-        if pr.merged_at > last_release and pr.merged_at < curr_release:
+        if pr.merged_at > last_release:
             recent_prs.append(pr)
 
     return recent_prs
@@ -157,7 +160,7 @@ def _create_pr(
 
 def _print_next_steps(url: str) -> None:
     click.secho(
-        f"\n[SUCCESS] Please review, approve, and merge PR before continuing to `tag` command",
+        f"\n[SUCCESS] Please review, approve, and merge PR before continuing to `publish` command",
         fg="green",
     )
     click.echo(f"Link to PR: {url}")
