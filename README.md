@@ -39,9 +39,9 @@ The tool is designed to do pretty much EVERYTHING for you. Do not run isolated `
 
 `ge_releaser` acts as an abstraction on top of our standard manual release process. While the following steps should get you creating releases with ease, it is also important to understand what is happening under the hood. For each of the primary commands that `ge_releaser` offers, the individual manual steps taken by the machine are noted below. Although you shouldn't have to use them, it may be handy if debugging is required.
 
-### CLI Process
+## CLI Process
 
-#### Prework
+### Prework
 - Install and setup the tool
   - Install the tool using the above instructions.
   - Create a [personal access GitHub token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token), unless you already have one.
@@ -49,24 +49,24 @@ The tool is designed to do pretty much EVERYTHING for you. Do not run isolated `
   - Save that token with `export GITHUB_TOKEN=...`.
 
 #### tag
+Run `ge_releaser tag <commit_hash> <release_version>`.
 ![tag](./assets/tag.png)
-- Run `ge_releaser tag <commit_hash> <release_version>`.
-  - This will tag that particular commit with your desired release SemVer.
-  - Wait until the Azure pipeline finishes running and confirm proper publishing to PyPI.
+- This will tag that particular commit with your desired release SemVer.
+- Wait until the Azure pipeline finishes running and confirm proper publishing to PyPI.
 
 #### prep
+Run `ge_releaser prep`.
 ![prep](./assets/prep.png)
-- Run `ge_releaser prep`.
-  - This will generate changelogs, update relevant files, and draft a PR titled `[RELEASE] <RELEASE_NUMBER>`.
-  - Review the contents of this PR and ensure it looks appropriate before merging.
-    - Check that the new changelog entry only contains changes that have transpired between the last release and this current one.
-    - Additionally, ensure that any external contributors recieve attribution for their efforts.
-    - NOTE: This process may include some additional entries (if the release commit selected is before HEAD). If so, please remove them to ensure an accurate changelog.
+- This will generate changelogs, update relevant files, and draft a PR titled `[RELEASE] <RELEASE_NUMBER>`.
+- Review the contents of this PR and ensure it looks appropriate before merging.
+  - Check that the new changelog entry only contains changes that have transpired between the last release and this current one.
+  - Additionally, ensure that any external contributors recieve attribution for their efforts.
+  - NOTE: This process may include some additional entries (if the release commit selected is before HEAD). If so, please remove them to ensure an accurate changelog.
 
 #### publish
+Run `ge_releaser publish`.
 ![publish](./assets/publish.png)
-- Run `ge_releaser publish`.
-  - This command will take the changelog notes generated from the previous step and write them to our GitHub Releases page.
+- This command will take the changelog notes generated from the previous step and write them to our GitHub Releases page.
 
 #### Community Announcement
 - Draft a message to the community and send it in the OSS Slack channel.
