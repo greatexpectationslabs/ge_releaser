@@ -49,13 +49,13 @@ The tool is designed to do pretty much EVERYTHING for you. Do not run isolated `
   - Save that token with `export GITHUB_TOKEN=...`.
 
 #### tag
-[tag](./assets/tag.png)
+![tag](./assets/tag.png)
 - Run `ge_releaser tag <commit_hash> <release_version>`.
   - This will tag that particular commit with your desired release SemVer.
   - Wait until the Azure pipeline finishes running and confirm proper publishing to PyPI.
 
 #### prep
-[prep](./assets/prep.png)
+![prep](./assets/prep.png)
 - Run `ge_releaser prep`.
   - This will generate changelogs, update relevant files, and draft a PR titled `[RELEASE] <RELEASE_NUMBER>`.
   - Review the contents of this PR and ensure it looks appropriate before merging.
@@ -64,7 +64,7 @@ The tool is designed to do pretty much EVERYTHING for you. Do not run isolated `
     - NOTE: This process may include some additional entries (if the release commit selected is before HEAD). If so, please remove them to ensure an accurate changelog.
 
 #### publish
-[publish](./assets/publish.png)
+![publish](./assets/publish.png)
 - Run `ge_releaser publish`.
   - This command will take the changelog notes generated from the previous step and write them to our GitHub Releases page.
 
