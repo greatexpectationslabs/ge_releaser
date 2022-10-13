@@ -17,4 +17,5 @@ setuptools.setup(
       [console_scripts]
       ge_releaser=ge_releaser.cli:cli
     """,
+    packages=["ge_releaser"],
 )
