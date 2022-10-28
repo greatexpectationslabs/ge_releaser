@@ -49,7 +49,7 @@ The tool is designed to do pretty much EVERYTHING for you. Do not run isolated `
   - Save that token with `export GITHUB_TOKEN=...`.
 
 #### tag
-Run `ge_releaser tag <commit_hash> <release_version>`.
+Run `ge_releaser tag "<commit_hash>" <release_version>`.
 ![tag](./assets/tag.png)
 - This will tag that particular commit with your desired release SemVer.
 - Wait until the Azure pipeline finishes running and confirm proper publishing to PyPI.
