@@ -100,7 +100,7 @@ Run `ge_releaser publish`.
   - Ensure that each line has a reference to its corresponding PR.
   - If coming from an external contributor, make sure the line ends in `(thanks @<contributor_id>)`.
   - Make sure we're only adding commits that have transpired between the last release and this current one.
-- Commit these three files and create a PR against `develop`.
+- Commit these four files and create a PR against `develop`.
   - Command: `git add great_expectations; git commit -m "release prep"; git push`
 - Receive approval and merge the PR.
 
