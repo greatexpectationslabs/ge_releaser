@@ -3,9 +3,9 @@ from typing import List
 import click
 from github.Repository import Repository
 
+from ge_releaser.cmd.util import parse_deployment_version_file
 from ge_releaser.constants import GxFile, GxURL
 from ge_releaser.git import GitEnvironment
-from ge_releaser.cmd.util import parse_deployment_version_file
 
 
 def publish(env: GitEnvironment) -> None:
@@ -41,6 +41,7 @@ def _gather_release_notes(release_version: str) -> List[str]:
             break
 
     return contents[start:end]
+
 
 def _print_next_steps() -> None:
     click.secho(" * Created release page (1/1)", fg="yellow")

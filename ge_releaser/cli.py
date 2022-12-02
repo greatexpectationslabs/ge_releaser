@@ -3,11 +3,11 @@ from typing import Optional
 
 import click
 
-from ge_releaser.constants import GITHUB_REPO, check_if_in_gx_root
-from ge_releaser.git import GitEnvironment
 from ge_releaser.cmd.prep import prep
 from ge_releaser.cmd.publish import publish
 from ge_releaser.cmd.tag import tag
+from ge_releaser.constants import GITHUB_REPO, check_if_in_gx_root
+from ge_releaser.git import GitEnvironment
 
 
 @click.group()
@@ -42,9 +42,7 @@ def tag_cmd(env: GitEnvironment, commit: str, version_number: str) -> None:
     help="Prepare changelogs, release version, and Getting Started version in a PR",
 )
 @click.pass_obj
-def prep_cmd(
-    env: GitEnvironment
-) -> None:
+def prep_cmd(env: GitEnvironment) -> None:
     prep(env=env)
 
 
