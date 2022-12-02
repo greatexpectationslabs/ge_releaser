@@ -14,6 +14,7 @@ class ChangelogCategory(enum.Enum):
     BUGFIX = "BUGFIX"
     DOCS = "DOCS"
     MAINTENANCE = "MAINTENANCE"
+    CONTRIB = "CONTRIB"
 
 
 class ChangelogCommit:
@@ -43,9 +44,7 @@ class ChangelogCommit:
         self.number = pr.number
         self.merge_timestamp = pr.merged_at
         self.attribution = (
-            f" (thanks @{pr.user.login})"
-            if pr.user.login not in teams
-            else ""
+            f" (thanks @{pr.user.login})" if pr.user.login not in teams else ""
         )
 
     def sort_key(self) -> Tuple[int, dt.datetime]:
@@ -61,9 +60,7 @@ class ChangelogCommit:
 
 
 class ChangelogEntry:
-    def __init__(
-        self, pull_requests: List[PullRequest]
-    ) -> None:
+    def __init__(self, pull_requests: List[PullRequest]) -> None:
         changelog_commits: List[ChangelogCommit] = []
         for pr in pull_requests:
             changelog_commit: ChangelogCommit = ChangelogCommit(pr)
@@ -99,9 +96,7 @@ class ChangelogEntry:
         else:
             raise ValueError("Invalid file type!")
 
-        contents[insertion_point:insertion_point] = render_fn(
-            release_version
-        )
+        contents[insertion_point:insertion_point] = render_fn(release_version)
 
         with open(outfile, "w") as f:
             f.writelines(contents)
