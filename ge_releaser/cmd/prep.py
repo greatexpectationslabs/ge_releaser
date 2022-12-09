@@ -11,9 +11,9 @@ from github.Repository import Repository
 from packaging import version
 
 from ge_releaser.changelog import ChangelogEntry
-from ge_releaser.cli import GitEnvironment
 from ge_releaser.cmd.util import checkout_and_update_develop
 from ge_releaser.constants import GxFile, GxURL
+from ge_releaser.git import GitEnvironment
 
 
 def prep(env: GitEnvironment) -> None:

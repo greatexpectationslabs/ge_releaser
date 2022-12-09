@@ -3,8 +3,8 @@ import os
 import click
 import git
 
-from ge_releaser.cli import GitEnvironment
 from ge_releaser.constants import GxURL
+from ge_releaser.git import GitEnvironment
 
 
 def tag(env: GitEnvironment, commit: str, version_number: str) -> None:
