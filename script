@@ -1,0 +1,48 @@
+#!/bin/bash
+
+# Project specific - you may want to change these if they don't match your needs
+ISSUE_TYPES=("FEATURE" "BUGFIX" "DOCS" "MAINTENANCE")
+TICKET_STATUS=("BACKLOG" "TO DO" "PR OPEN" "DONE" "RESOLVED - WON'T FIX")
+
+# 1. Check prereqs before executing script
+deps=("gum" "jira")
+for dep in "${deps[@]}"; do
+	command -v "$dep" >/dev/null 2>&1 || {
+		echo >&2 "missing required dependency: $dep"
+		exit 1
+	}
+done
+
+# 2. Gather user input
+echo "Please fill out the following prompts to create a JIRA ticket and a corresponding working branch!"
+issue_title=$(gum input --placeholder="Issue Title:")
+issue_type=$(gum choose "${ISSUE_TYPES[@]}")
+description=$(gum write --placeholder="Description (CTRL+D to finish):")
+acceptance_criteria=$(gum write --placeholder="Acceptance Criteria (CTRL+D to finish):")
+
+# 3. Create JIRA issue
+issue_confirmation=$(
+	jira issue create \
+		--type "Task" \
+		--summary "$issue_title" \
+		--body "$description" \
+		--assignee "$(jira me)" \
+		--custom acceptance-criteria="$acceptance_criteria" \
+		--no-input
+)
+echo "$issue_confirmation"
+jira_issue=$(basename "$issue_confirmation")
+
+# 4. Construct branch
+prefix=$(echo "$issue_type" | tr '[:upper:]' '[:lower:]' | cut -c 1)
+branch_description=$(echo "$issue_title" | tr ' ' '_' | tr '[:upper:]' '[:lower:]')
+branch_name="$prefix/$jira_issue/$branch_description"
+
+# 5. Determine if currently working on issue
+status=$(gum choose "${TICKET_STATUS[@]}")
+jira issue move "$jira_issue" "$status"
+
+# 5. Checkout branch
+if gum confirm "Checkout branch and begin work?"; then
+	git checkout -b "$branch_name"
+fi
