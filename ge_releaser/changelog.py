@@ -24,23 +24,20 @@ class ChangelogCommit:
         with open(GxFile.TEAMS) as f:
             teams = f.read().strip()
 
-        if pr.title[0] == "[":
-            try:
-                type_, self.desc = re.match(r"\[([a-zA-Z]+)\] ?(.*)", pr.title).group(
-                    1, 2
-                )
-                type_ = type_.upper()
-                self.pr_type = (
-                    ChangelogCategory[type_]
-                    if type_ in ChangelogCategory.__members__
-                    else ChangelogCategory.MAINTENANCE
-                )
-            except AttributeError:
-                print(f"Couldn't parse PR title: {pr.title}")
-                return
-        else:
+        title = pr.title.strip()
+        try:
+            type_, self.desc = re.match(r"\[([a-zA-Z]+)\] ?(.*)", title).group(1, 2)
+            type_ = type_.upper()
+            self.pr_type = (
+                ChangelogCategory[type_]
+                if type_ in ChangelogCategory.__members__
+                else ChangelogCategory.MAINTENANCE
+            )
+        except AttributeError:
+            print(f"Couldn't parse PR title: {title} ({pr.number})")
             self.pr_type = ChangelogCategory.MAINTENANCE
             self.desc = pr.title
+
         self.number = pr.number
         self.merge_timestamp = pr.merged_at
         self.attribution = (
