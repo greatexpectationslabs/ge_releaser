@@ -5,7 +5,7 @@ from typing import Callable, Dict, List, Tuple
 
 from github.PullRequest import PullRequest
 
-from ge_releaser.constants import GxFile
+from ge_releaser.constants import GxFile, GxURL
 
 
 class ChangelogCategory(enum.Enum):
@@ -51,9 +51,11 @@ class ChangelogCommit:
         return categories[self.pr_type], self.merge_timestamp
 
     def __str__(self) -> str:
-        return (
-            f"* [{self.pr_type.value}] {self.desc} (#{self.number}){self.attribution}"
+        details = f"* [{self.pr_type.value}] {self.desc}"
+        reference = (
+            f"([#{self.number}]({GxURL.PULL_REQUESTS}/{self.number})){self.attribution}"
         )
+        return f"{details} {reference}"
 
 
 class ChangelogEntry:
