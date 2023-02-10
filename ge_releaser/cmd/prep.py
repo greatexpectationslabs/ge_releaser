@@ -80,7 +80,7 @@ def _update_getting_started_snippet(release_version: str) -> None:
     If the .mdx file already exists, it is overwritten when the script runs.
     """
     with open(GxFile.GETTING_STARTED_VERSION, "w") as snippet_file:
-        lines = ("```\n", f"great_expectations, version {release_version}", "\n```")
+        lines = [f"<span>great_expectations, version {release_version}</span>"]
         snippet_file.writelines(lines)
 
 
