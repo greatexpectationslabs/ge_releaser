@@ -17,8 +17,8 @@ class GxFile(str, enum.Enum):
     CHANGELOG_MD = "docs/changelog.md"
     CHANGELOG_RST = "docs_rtd/changelog.rst"
     TEAMS = ".github/teams.yml"
-    GETTING_STARTED_VERSION = (
-        "docs/tutorials/getting_started/tutorial_version_snippet.mdx"
+    DOCS_DATA_COMPONENT = (
+        "docs/components/_data.jsx"
     )
 
 

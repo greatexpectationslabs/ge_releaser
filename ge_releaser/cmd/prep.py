@@ -31,17 +31,24 @@ def prep(env: GitEnvironment) -> None:
     _update_deployment_version_file(release_version)
     click.secho(" * Updated deployment version file (2/6)", fg="yellow")
 
-    _update_getting_started_snippet(release_version)
-    click.secho(" * Updated version in tutorial snippet (3/6)", fg="yellow")
+    _update_docs_component(last_version=last_version, release_version=release_version)
+    click.secho(" * Updated version in docs data component (3/6)", fg="yellow")
 
-    _update_changelogs(env.github_repo, last_version, release_version)
+    _update_changelogs(
+        github_repo=env.github_repo,
+        last_version=last_version,
+        release_version=release_version,
+    )
     click.secho(" * Updated changelogs (4/6)", fg="yellow")
 
     _commit_changes(env.git_repo)
     click.secho(" * Committed changes (5/6)", fg="yellow")
 
     url: str = _create_pr(
-        env.git_repo, env.github_repo, release_branch, release_version
+        git_repo=env.git_repo,
+        github_repo=env.github_repo,
+        release_branch=release_branch,
+        release_version=release_version,
     )
     click.secho(" * Opened prep PR (6/6)", fg="yellow")
 
@@ -73,15 +80,22 @@ def _update_deployment_version_file(release_version: str) -> None:
         f.write(f"{release_version.strip()}\n")
 
 
-def _update_getting_started_snippet(release_version: str) -> None:
-    """Creates a `.mdx` file containing the expected output of the CLI command `great_expectations --version` in a
-     markdown codeblock.
+def _update_docs_component(last_version: str, release_version: str) -> None:
+    """Updates the JSX file in our docs directory responsible for tracking GX and Python versions.
 
-    If the .mdx file already exists, it is overwritten when the script runs.
+    It looks something like this:
+    ```jsx
+    export default {
+      release_version: 'great_expectations, version 0.15.48',
+      min_python: 'Python 3.7',
+      max_python: 'Python 3.10'
+    }
+    ```
     """
-    with open(GxFile.GETTING_STARTED_VERSION, "w") as snippet_file:
-        lines = ("```\n", f"great_expectations, version {release_version}", "\n```")
-        snippet_file.writelines(lines)
+    with open(GxFile.DOCS_DATA_COMPONENT, "r+") as f:
+        contents = f.read()
+        contents = contents.replace(last_version, release_version)
+        f.write(contents)
 
 
 def _update_changelogs(
