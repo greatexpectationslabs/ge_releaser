@@ -92,9 +92,11 @@ def _update_docs_component(last_version: str, release_version: str) -> None:
     }
     ```
     """
-    with open(GxFile.DOCS_DATA_COMPONENT, "r+") as f:
+    with open(GxFile.DOCS_DATA_COMPONENT, "r") as f:
         contents = f.read()
         contents = contents.replace(last_version, release_version)
+
+    with open(GxFile.DOCS_DATA_COMPONENT, "w") as f:
         f.write(contents)
 
 
