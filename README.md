@@ -26,10 +26,12 @@ These commands are to be executed in Great Expectations development directory (b
 
 ```bash
 # Commands are meant to be run sequentially
-ge_releaser tag "4b3b70f68802" "0.15.25" # Tag the appropriate commit and trigger the build process
+ge_releaser tag <git_hash> <semver>      # Tag the appropriate commit and trigger the build process
 ge_releaser prep                         # Modify changelogs and open a PR.
 ge_releaser publish                      # Create a new GitHub release page
 ```
+
+Please follow the detailed instructions below to know when to progress to the next step.
 
 The tool is designed to do pretty much EVERYTHING for you. Do not run isolated `git` commands (unless resolving merge conflicts).
 
@@ -53,7 +55,7 @@ Run `ge_releaser tag "<commit_hash>" <release_version>`.
 ![tag](./assets/tag.png)
 - This will tag that particular commit with your desired release SemVer.
   - If you wish to tag the latest commit on the trunk, just use `HEAD` instead of a commit hash.
-- Wait until the Azure pipeline finishes running and confirm proper publishing to PyPI.
+- **IMPORTANT** - Wait until the Azure pipeline finishes running and confirm proper publishing to PyPI.
 
 #### prep
 Run `ge_releaser prep`.
