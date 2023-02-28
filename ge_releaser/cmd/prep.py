@@ -1,30 +1,24 @@
-import datetime as dt
 import logging
 import os
 from typing import List, Tuple
 
 import click
-import git
-from github.PaginatedList import PaginatedList
 from github.PullRequest import PullRequest
-from github.Repository import Repository
-from packaging import version
 
 from ge_releaser.changelog import ChangelogEntry
-from ge_releaser.cmd.util import checkout_and_update_develop
 from ge_releaser.constants import GxFile, GxURL
-from ge_releaser.git import GitEnvironment
+from ge_releaser.git import GitService
 
 
-def prep(env: GitEnvironment) -> None:
+def prep(git_service: GitService) -> None:
     click.secho("[prep]", bold=True, fg="blue")
 
-    last_version, release_version = _parse_versions(env.git_repo)
+    last_version, release_version = _parse_versions(git_service)
 
-    checkout_and_update_develop(env.git_repo)
+    git_service.checkout_and_update_trunk()
 
-    release_branch: str = _create_and_checkout_release_branch(
-        env.git_repo, release_version
+    release_branch = _create_and_checkout_release_branch(
+        git_service=git_service, release_version=release_version
     )
     click.secho(" * Created a release branch (1/6)", fg="yellow")
 
@@ -35,18 +29,17 @@ def prep(env: GitEnvironment) -> None:
     click.secho(" * Updated version in docs data component (3/6)", fg="yellow")
 
     _update_changelogs(
-        github_repo=env.github_repo,
+        git_service=git_service,
         last_version=last_version,
         release_version=release_version,
     )
     click.secho(" * Updated changelogs (4/6)", fg="yellow")
 
-    _commit_changes(env.git_repo)
+    _commit_changes(git_service)
     click.secho(" * Committed changes (5/6)", fg="yellow")
 
-    url: str = _create_pr(
-        git_repo=env.git_repo,
-        github_repo=env.github_repo,
+    url = _create_pr(
+        git_service=git_service,
         release_branch=release_branch,
         release_version=release_version,
     )
@@ -55,23 +48,15 @@ def prep(env: GitEnvironment) -> None:
     _print_next_steps(url)
 
 
-def _parse_versions(
-    git_repo: git.Repo,
-) -> Tuple[str, str]:
-    tags = sorted(git_repo.tags, key=lambda t: t.commit.committed_datetime)
-    release_version = version.parse(str(tags[-1]))
-    last_version = version.parse(str(tags[-2]))
-
-    assert release_version > last_version, "Version provided to command is not valid"
-
-    return str(last_version), str(release_version)
+def _parse_versions(git_service: GitService) -> Tuple[str, str]:
+    return git_service.get_release_and_current_versions()
 
 
 def _create_and_checkout_release_branch(
-    git_repo: git.Repo, release_version: str
+    git_service: GitService, release_version: str
 ) -> str:
-    branch_name: str = f"release-{release_version}"
-    git_repo.git.checkout("HEAD", b=branch_name)
+    branch_name = f"release-{release_version}"
+    git_service.create_and_checkout_branch(branch_name)
     return branch_name
 
 
@@ -99,12 +84,12 @@ def _update_docs_component(last_version: str, release_version: str) -> None:
 
 
 def _update_changelogs(
-    github_repo: Repository,
+    git_service: GitService,
     last_version: str,
     release_version: str,
 ) -> None:
     relevant_prs: List[PullRequest] = _collect_prs_since_last_release(
-        github_repo, last_version
+        git_service=git_service, last_version=last_version
     )
 
     changelog_entry: ChangelogEntry = ChangelogEntry(relevant_prs)
@@ -114,17 +99,15 @@ def _update_changelogs(
 
 
 def _collect_prs_since_last_release(
-    github_repo: Repository,
+    git_service: GitService,
     last_version: str,
 ) -> List[PullRequest]:
     # 20220923 - Chetan - Currently, this grabs all PRs from the last release until the moment of program execution.
     # This should be updated so the changelog generation stops once it hits the release commit.
 
-    last_release: dt.datetime = github_repo.get_release(last_version).created_at
+    last_release = git_service.get_release_timestamp(last_version)
 
-    merged_prs: PaginatedList[PullRequest] = github_repo.get_pulls(
-        base="develop", state="closed", sort="updated", direction="desc"
-    )
+    merged_prs = git_service.get_merged_prs()
     recent_prs: List[PullRequest] = []
 
     # To ensure we don't accidently exit early, we set a threshold and wait to see a few old PRs before completing iteration
@@ -148,25 +131,18 @@ def _collect_prs_since_last_release(
     return recent_prs
 
 
-def _commit_changes(git_repo: git.Repo) -> None:
-    git_repo.git.add(".")
-    # Bypass pre-commit (if running locally on a dev env)
-    git_repo.git.commit("-m", "release prep", "--no-verify")
+def _commit_changes(git_service: GitService) -> None:
+    git_service.add_all_and_commit("release prep")
 
 
 def _create_pr(
-    git_repo: git.Repo,
-    github_repo: Repository,
+    git_service: GitService,
     release_branch: str,
     release_version: str,
 ) -> str:
-    git_repo.git.push("--set-upstream", "origin", release_branch)
-
-    pr: PullRequest = github_repo.create_pull(
-        title=f"[RELEASE] {release_version}",
-        body=f"release prep for {release_version}",
-        head=release_branch,
-        base="develop",
+    git_service.push_to_remote(ref=release_branch, set_upstream=True)
+    pr = git_service.create_pr(
+        release_version=release_version, release_branch=release_branch
     )
 
     return os.path.join(GxURL.PULL_REQUESTS, str(pr.number))
