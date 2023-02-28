@@ -1,5 +1,4 @@
 import os
-from typing import Optional
 
 import click
 
@@ -20,13 +19,12 @@ def cli(ctx: click.Context) -> None:
 
     Please run `<command> help` for more specific details.
     """
-    token: Optional[str] = os.git_serviceiron.get("GITHUB_TOKEN")
-    assert token is not None, "Must set GITHUB_TOKEN git_serviceironment variable!"
+    token = os.environ.get("GITHUB_TOKEN")
+    assert token is not None, "Must set GITHUB_TOKEN environment variable!"
 
     check_if_in_gx_root()
 
-    git_service: GitService = GitService(token, GITHUB_REPO)
-    ctx.obj = git_service
+    ctx.obj = GitService(token, GITHUB_REPO)
 
 
 @cli.command(name="tag", help="Tag the new release")
