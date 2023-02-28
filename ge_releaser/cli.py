@@ -5,7 +5,7 @@ import click
 from ge_releaser.cmd.prep import prep
 from ge_releaser.cmd.publish import publish
 from ge_releaser.cmd.tag import tag
-from ge_releaser.constants import GITHUB_REPO, check_if_in_gx_root
+from ge_releaser.constants import GITHUB_ENV_VAR, GITHUB_REPO, check_if_in_gx_root
 from ge_releaser.git import GitService
 
 
@@ -19,20 +19,12 @@ def cli(ctx: click.Context) -> None:
 
     Please run `<command> help` for more specific details.
     """
-    token = os.environ.get("GITHUB_TOKEN")
-    assert token is not None, "Must set GITHUB_TOKEN environment variable!"
+    token = os.environ.get(GITHUB_ENV_VAR)
+    assert token is not None, f"Must set {GITHUB_ENV_VAR} environment variable!"
 
     check_if_in_gx_root()
 
     ctx.obj = GitService(token, GITHUB_REPO)
-
-
-@cli.command(name="tag", help="Tag the new release")
-@click.argument("commit", type=str, nargs=1, required=True)
-@click.argument("version_number", type=str, nargs=1, required=True)
-@click.pass_obj
-def tag_cmd(git_service: GitService, commit: str, version_number: str) -> None:
-    tag(git_service=git_service, commit=commit, version_number=version_number)
 
 
 @cli.command(
@@ -42,6 +34,14 @@ def tag_cmd(git_service: GitService, commit: str, version_number: str) -> None:
 @click.pass_obj
 def prep_cmd(git_service: GitService) -> None:
     prep(git_service=git_service)
+
+
+@cli.command(name="tag", help="Tag the new release")
+@click.argument("commit", type=str, nargs=1, required=True)
+@click.argument("version_number", type=str, nargs=1, required=True)
+@click.pass_obj
+def tag_cmd(git_service: GitService, commit: str, version_number: str) -> None:
+    tag(git_service=git_service, commit=commit, version_number=version_number)
 
 
 @cli.command(name="publish", help="Publish a new release entry in our GitHub page")

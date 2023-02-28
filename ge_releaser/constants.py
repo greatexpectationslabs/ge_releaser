@@ -1,7 +1,8 @@
 import enum
 import os
 
-GITHUB_REPO: str = "great-expectations/great_expectations"
+GITHUB_ENV_VAR = "GITHUB_TOKEN"
+GITHUB_REPO = "great-expectations/great_expectations"
 
 
 class GxURL(str, enum.Enum):
