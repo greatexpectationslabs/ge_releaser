@@ -142,7 +142,9 @@ def _create_pr(
 ) -> str:
     git_service.push_to_remote(ref=release_branch, set_upstream=True)
     pr = git_service.create_pr(
-        release_version=release_version, release_branch=release_branch
+        title=f"[RELEASE] {release_version}",
+        body=f"release prep for {release_version}",
+        head=release_branch,
     )
 
     return os.path.join(GxURL.PULL_REQUESTS, str(pr.number))

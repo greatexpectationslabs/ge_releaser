@@ -71,10 +71,10 @@ class GitService:
         # Bypass pre-commit (if running locally on a dev env)
         self._git.git.commit("-m", message, "--no-verify")
 
-    def create_pr(self, release_version: str, release_branch: str) -> PullRequest:
+    def create_pr(self, title: str, body: str, head: str) -> PullRequest:
         return self._gh_repo.create_pull(
-            title=f"[RELEASE] {release_version}",
-            body=f"release prep for {release_version}",
-            head=release_branch,
+            title=title,
+            body=body,
+            head=head,
             base=GitService.TRUNK,
         )
