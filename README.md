@@ -88,6 +88,7 @@ Entries in the changelog should appear as:
 Specifically:
 - Capitalize the first letter of the subject after the [TAG]
 - Do not use punctuation as the first character of the subject after the [TAG]
+- Tags are one of the defined tags in our [contributor guide](https://docs.greatexpectations.io/docs/contributing/contributing_checklist/#1-create-a-pr)
 - Make clear call-outs for adding expectations by including the name of the expectation (ex: expect_values_are_prime_numbers)
 - PRs should be written in the present tense
 - The PR numbers should appear in parenthesis and be linked to the PR
