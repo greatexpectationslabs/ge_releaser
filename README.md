@@ -26,10 +26,12 @@ These commands are to be executed in Great Expectations development directory (b
 
 ```bash
 # Commands are meant to be run sequentially
-ge_releaser tag "4b3b70f68802" "0.15.25" # Tag the appropriate commit and trigger the build process
+ge_releaser tag <git_hash> <semver>      # Tag the appropriate commit and trigger the build process
 ge_releaser prep                         # Modify changelogs and open a PR.
 ge_releaser publish                      # Create a new GitHub release page
 ```
+
+Please follow the detailed instructions below to know when to progress to the next step.
 
 The tool is designed to do pretty much EVERYTHING for you. Do not run isolated `git` commands (unless resolving merge conflicts).
 
@@ -53,7 +55,7 @@ Run `ge_releaser tag "<commit_hash>" <release_version>`.
 ![tag](./assets/tag.png)
 - This will tag that particular commit with your desired release SemVer.
   - If you wish to tag the latest commit on the trunk, just use `HEAD` instead of a commit hash.
-- Wait until the Azure pipeline finishes running and confirm proper publishing to PyPI.
+- **IMPORTANT** - Wait until the Azure pipeline finishes running and confirm proper publishing to PyPI.
 
 #### prep
 Run `ge_releaser prep`.
@@ -78,6 +80,20 @@ Run `ge_releaser publish`.
   - Send the reviewed message to the community Slack channel `#announcements`.
   - Request emoji signal boosting from the team in private Slack channel `#topic-great_expectations`.
 
+##### Formatting the Community Announcement Changelog
+Entries in the changelog should appear as:
+
+>[FEATURE] Enable customization of candidate Regular Expression patterns when running OnboardingDataAssistant ([#7104](https://github.com/great-expectations/great_expectations/pull/7104))
+
+Specifically:
+- Capitalize the first letter of the subject after the [TAG]
+- Do not use punctuation as the first character of the subject after the [TAG]
+- Tags are one of the defined tags in our [contributor guide](https://docs.greatexpectations.io/docs/contributing/contributing_checklist/#1-create-a-pr)
+- Make clear call-outs for adding expectations by including the name of the expectation (ex: expect_values_are_prime_numbers)
+- PRs should be written in the present tense
+- The PR numbers should appear in parenthesis and be linked to the PR
+- Contributors are credited with (thanks @username)
+
 ### Manual Process
 
 #### tag:
@@ -100,7 +116,7 @@ Run `ge_releaser publish`.
   - Ensure that each line has a reference to its corresponding PR.
   - If coming from an external contributor, make sure the line ends in `(thanks @<contributor_id>)`.
   - Make sure we're only adding commits that have transpired between the last release and this current one.
-- Commit these three files and create a PR against `develop`.
+- Commit these four files and create a PR against `develop`.
   - Command: `git add great_expectations; git commit -m "release prep"; git push`
 - Receive approval and merge the PR.
 
