@@ -57,6 +57,11 @@ Run `ge_releaser tag "<commit_hash>" <release_version>`.
   - If you wish to tag the latest commit on the trunk, just use `HEAD` instead of a commit hash.
 - **IMPORTANT** - Wait until the Azure pipeline finishes running and confirm proper publishing to PyPI.
 
+Make sure to ask the team about any necessary PR's that might need to go in before running this command.
+```bash
+# Shell command to check if any PR's are set to automerge (requires jq)
+curl -s https://api.github.com/repos/great-expectations/great_expectations/pulls | jq '.[] | select(.auto_merge.merge_method == "squash") | {title: .title, author: .user.login, date: .created_at, link: .html_url}'
+```
 #### prep
 Run `ge_releaser prep`.
 ![prep](./assets/prep.png)
