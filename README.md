@@ -76,6 +76,16 @@ Run `ge_releaser publish`.
 ![publish](./assets/publish.png)
 - This command will take the changelog notes generated from the previous step and write them to our GitHub Releases page.
 
+#### Yanking Releases
+- Although it shouldn't be a common occurrence due to our CI, there may be situations that necessitate the removal or yanking of a release.
+- In the case a release needs to be yanked, please take the following steps:
+  1. Patch the issue and release a new version (following all the steps noted above).
+  2. Pair with a PyPI maintainer with "Owner" privileges (as of 0.16.6, James, Don, and Chetan are owners).
+    - Navigate to `Your account` -> `great_expectations` -> `Releases`.
+    - Click the `Options` drop-down for the target release and select `Yank`.
+    - Omit the `Reason` field and submit.
+  3. Draft a community announcement, have the team review it in `#topic-great_expectations`, and send the reviewed message to the community Slack channel `#announcements`.
+
 #### Community Announcement
 - Draft a message to the community and send it in the OSS Slack channel.
   - To make sure the message is appropriate, draft an announcement and have the team review it in `#topic-great_expectations`.
