@@ -20,6 +20,7 @@ class GxFile(str, enum.Enum):
     DOCS_DATA_COMPONENT = (
         "docs/docusaurus/docs/components/_data.jsx"
     )
+    DOCS_CONFIG = "docs/docusaurus/docusaurus.config.js"
 
 
 def check_if_in_gx_root() -> None:

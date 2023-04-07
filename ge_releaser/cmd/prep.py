@@ -26,23 +26,26 @@ def prep(env: GitEnvironment) -> None:
     release_branch: str = _create_and_checkout_release_branch(
         env.git_repo, release_version
     )
-    click.secho(" * Created a release branch (1/6)", fg="yellow")
+    click.secho(" * Created a release branch (1/7)", fg="yellow")
 
     _update_deployment_version_file(release_version)
-    click.secho(" * Updated deployment version file (2/6)", fg="yellow")
+    click.secho(" * Updated deployment version file (2/7)", fg="yellow")
 
     _update_docs_component(last_version=last_version, release_version=release_version)
-    click.secho(" * Updated version in docs data component (3/6)", fg="yellow")
+    click.secho(" * Updated version in docs data component (3/7)", fg="yellow")
+
+    _update_docs_version_dropdown(last_version=last_version, release_version=release_version)
+    click.secho(" * Updated version in docs version dropdown (4/7)", fg="yellow")
 
     _update_changelogs(
         github_repo=env.github_repo,
         last_version=last_version,
         release_version=release_version,
     )
-    click.secho(" * Updated changelogs (4/6)", fg="yellow")
+    click.secho(" * Updated changelogs (5/7)", fg="yellow")
 
     _commit_changes(env.git_repo)
-    click.secho(" * Committed changes (5/6)", fg="yellow")
+    click.secho(" * Committed changes (6/7)", fg="yellow")
 
     url: str = _create_pr(
         git_repo=env.git_repo,
@@ -50,7 +53,7 @@ def prep(env: GitEnvironment) -> None:
         release_branch=release_branch,
         release_version=release_version,
     )
-    click.secho(" * Opened prep PR (6/6)", fg="yellow")
+    click.secho(" * Opened prep PR (7/7)", fg="yellow")
 
     _print_next_steps(url)
 
@@ -96,6 +99,25 @@ def _update_docs_component(last_version: str, release_version: str) -> None:
         contents = f.read()
     updated_contents = contents.replace(last_version, release_version)
     with open(GxFile.DOCS_DATA_COMPONENT, "w") as f:
+        f.write(updated_contents)
+
+def _update_docs_version_dropdown(last_version: str, release_version: str) -> None:
+    """Updates the docusaurus config file responsible for display of the version dropdown.
+
+    It looks something like this:
+    ```js
+    versions: {
+        current: {
+          label: '0.16.6',
+          path: ''
+        }
+      }
+    ```
+    """
+    with open(GxFile.DOCS_CONFIG) as f:
+        contents = f.read()
+    updated_contents = contents.replace(last_version, release_version)
+    with open(GxFile.DOCS_CONFIG, "w") as f:
         f.write(updated_contents)
 
 
