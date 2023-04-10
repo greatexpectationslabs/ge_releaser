@@ -1,30 +1,34 @@
-from typing import List
+from typing import List, cast
 
 import click
-from github.Repository import Repository
+from packaging import version
 
-from ge_releaser.cmd.util import parse_deployment_version_file
 from ge_releaser.constants import GxFile, GxURL
-from ge_releaser.git import GitEnvironment
+from ge_releaser.git import GitService
 
 
-def publish(env: GitEnvironment) -> None:
+def publish(git: GitService) -> None:
     click.secho("[publish]", bold=True, fg="blue")
 
-    release_version: str = str(parse_deployment_version_file())
+    release_version = _parse_deployment_version_file()
 
-    _create_release(env.github_repo, release_version, draft=False)
+    _create_release(git, release_version, draft=False)
 
     _print_next_steps()
 
 
-def _create_release(github_repo: Repository, release_version: str, draft: bool) -> None:
-    release_notes: List[str] = _gather_release_notes(release_version)
-    message: str = "".join(line for line in release_notes)
+def _parse_deployment_version_file() -> str:
+    with open(GxFile.DEPLOYMENT_VERSION) as f:
+        contents: str = str(f.read()).strip()
+        current_version = cast(version.Version, version.parse(contents))
 
-    github_repo.create_git_release(
-        tag=release_version, name=release_version, message=message, draft=draft
-    )
+    return str(current_version)
+
+
+def _create_release(git: GitService, release_version: str, draft: bool) -> None:
+    release_notes = _gather_release_notes(release_version)
+    message = "".join(line for line in release_notes)
+    git.create_release(version=release_version, message=message, draft=draft)
 
 
 def _gather_release_notes(release_version: str) -> List[str]:

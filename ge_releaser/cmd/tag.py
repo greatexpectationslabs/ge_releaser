@@ -1,34 +1,34 @@
 import os
 
 import click
-import git
 
 from ge_releaser.constants import GxURL
-from ge_releaser.git import GitEnvironment
+from ge_releaser.git import GitService
 
 
-def tag(env: GitEnvironment, commit: str, version_number: str) -> None:
+def tag(git: GitService, commit: str, version_number: str) -> None:
     click.secho("[tag]", bold=True, fg="blue")
 
-    _tag_release_commit(env.git_repo, commit, version_number)
+    _tag_release_commit(git, commit, version_number)
     click.secho(f" * Tagged commit '{commit}' on develop (1/2)", fg="yellow")
 
-    _push_tag_to_remote(env.git_repo, version_number)
+    _push_tag_to_remote(git, version_number)
     click.secho(" * Pushed tag to remote (2/2)", fg="yellow")
 
     _print_next_steps(version_number)
 
 
-def _tag_release_commit(git_repo: git.Repo, commit: str, release_version: str) -> None:
-    if "develop" not in git_repo.git.branch("--contains", commit):
-        raise ValueError("Selected commit is not a part of the 'develop' branch!")
+def _tag_release_commit(git: GitService, commit: str, release_version: str) -> None:
+    if not git.check_if_commit_is_part_of_trunk(commit):
+        raise ValueError(
+            f"Selected commit {commit} is not a part of the 'develop' branch!"
+        )
 
-    git_repo.git.checkout(commit)
-    git_repo.git.tag("-a", release_version, "-m", f'"{release_version}"')
+    git.tag_commit(commit=commit, version=release_version)
 
 
-def _push_tag_to_remote(git_repo: git.Repo, release_version: str) -> None:
-    git_repo.git.push("origin", release_version)
+def _push_tag_to_remote(git: GitService, release_version: str) -> None:
+    git.push_branch_to_remote(branch=release_version)
 
 
 def _print_next_steps(version_number: str) -> None:
