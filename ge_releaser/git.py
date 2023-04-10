@@ -54,7 +54,7 @@ class GitService:
         if set_upstream:
             args.append("--set-upstream")
         args += [self._remote, branch]
-        self._git.git.push(**args)
+        self._git.git.push(*args)
 
     def create_pr(self, title: str, body: str, head: str) -> PullRequest:
         return self._gh.create_pull(
