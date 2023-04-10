@@ -39,7 +39,7 @@ def prep(git: GitService) -> None:
     )
     click.secho(" * Updated changelogs (5/7)", fg="yellow")
 
-    _commit_changes(git)
+    git.stage_all_and_commit("release_prep")
     click.secho(" * Committed changes (6/7)", fg="yellow")
 
     url: str = _create_pr(
@@ -160,10 +160,6 @@ def _collect_prs_since_last_release(
     return recent_prs
 
 
-def _commit_changes(git: GitService) -> None:
-    git.add_and_commit("release_prep")
-
-
 def _create_pr(
     git: GitService,
     release_branch: str,
@@ -182,7 +178,7 @@ def _create_pr(
 
 def _print_next_steps(url: str) -> None:
     click.secho(
-        f"\n[SUCCESS] Please review, approve, and merge PR before continuing to `publish` command",
+        "\n[SUCCESS] Please review, approve, and merge PR before continuing to `publish` command",
         fg="green",
     )
     click.echo(f"Link to PR: {url}")

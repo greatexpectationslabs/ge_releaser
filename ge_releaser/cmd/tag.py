@@ -12,7 +12,7 @@ def tag(git: GitService, commit: str, version_number: str) -> None:
     _tag_release_commit(git, commit, version_number)
     click.secho(f" * Tagged commit '{commit}' on develop (1/2)", fg="yellow")
 
-    _push_tag_to_remote(git, version_number)
+    git.push_branch_to_remote(branch=version_number, set_upstream=False)
     click.secho(" * Pushed tag to remote (2/2)", fg="yellow")
 
     _print_next_steps(version_number)
@@ -27,14 +27,10 @@ def _tag_release_commit(git: GitService, commit: str, release_version: str) -> N
     git.tag_commit(commit=commit, version=release_version)
 
 
-def _push_tag_to_remote(git: GitService, release_version: str) -> None:
-    git.push_branch_to_remote(branch=release_version)
-
-
 def _print_next_steps(version_number: str) -> None:
-    tag_url: str = os.path.join(GxURL.RELEASES, "tag", version_number)
+    tag_url = os.path.join(GxURL.RELEASES, "tag", version_number)
     click.secho(
-        f"\nPlease wait for the build process and PyPI publishing to complete before moving to the `prep` cmd.",
+        "\nPlease wait for the build process and PyPI publishing to complete before moving to the `prep` cmd.",
         fg="green",
     )
     click.echo(f"Link to tag: {tag_url}")

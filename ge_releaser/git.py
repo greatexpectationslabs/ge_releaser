@@ -3,6 +3,7 @@ from typing import List
 
 import git
 import github
+from github.PaginatedList import PaginatedList
 from github.PullRequest import PullRequest
 
 
@@ -36,14 +37,14 @@ class GitService:
         self._git.git.checkout(self._trunk)
         self._git.git.pull(self._remote, self._trunk)
 
-    def add_and_commit(self, message: str) -> None:
+    def stage_all_and_commit(self, message: str) -> None:
         self._git.git.add(".")
         self._git.git.commit("-m", message, "--no-verify")
 
     def get_release_timestamp(self, version: str) -> dt.datetime:
         return self._gh.get_release(version).created_at
 
-    def get_merged_prs(self):
+    def get_merged_prs(self) -> PaginatedList[PullRequest]:
         return self._gh.get_pulls(
             base=self._trunk, state="closed", sort="updated", direction="desc"
         )
