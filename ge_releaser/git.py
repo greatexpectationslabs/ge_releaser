@@ -1,9 +1,8 @@
 import datetime as dt
-from typing import List
+from typing import Iterable, List
 
 import git
 import github
-from github.PaginatedList import PaginatedList
 from github.PullRequest import PullRequest
 
 
@@ -44,7 +43,7 @@ class GitService:
     def get_release_timestamp(self, version: str) -> dt.datetime:
         return self._gh.get_release(version).created_at
 
-    def get_merged_prs(self) -> PaginatedList[PullRequest]:
+    def get_merged_prs(self) -> Iterable[PullRequest]:
         return self._gh.get_pulls(
             base=self._trunk, state="closed", sort="updated", direction="desc"
         )

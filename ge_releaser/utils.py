@@ -24,7 +24,7 @@ def check_if_in_gx_root() -> None:
             )
 
 
-def check_if_using_latest_version():
+def check_if_using_latest_version() -> None:
     current_version = _get_current_version()
     latest_version = _get_latest_version()
     if current_version != latest_version:
