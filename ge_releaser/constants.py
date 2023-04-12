@@ -1,5 +1,4 @@
 import enum
-import os
 import pathlib
 
 RELEASER_LOCAL_VERSION = str(
@@ -8,6 +7,8 @@ RELEASER_LOCAL_VERSION = str(
 RELEASER_REMOTE_VERSION = (
     "https://raw.githubusercontent.com/greatexpectationslabs/ge_releaser/main/VERSION"
 )
+TRUNK = "develop"
+REMOTE = "origin"
 GITHUB_REPO = "great-expectations/great_expectations"
 
 
@@ -26,11 +27,3 @@ class GxFile(str, enum.Enum):
     TEAMS = ".github/teams.yml"
     DOCS_DATA_COMPONENT = "docs/docusaurus/docs/components/_data.jsx"
     DOCS_CONFIG = "docs/docusaurus/docusaurus.config.js"
-
-
-def check_if_in_gx_root() -> None:
-    for constant in GxFile:
-        if not os.path.exists(constant):
-            raise ValueError(
-                f"Could not find '{constant}'; are you sure you're in the root of the OSS repo?"
-            )
