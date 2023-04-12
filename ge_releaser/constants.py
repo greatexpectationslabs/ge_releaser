@@ -1,7 +1,8 @@
 import enum
-import os
 
-GITHUB_REPO: str = "great-expectations/great_expectations"
+TRUNK = "develop"
+REMOTE = "origin"
+GITHUB_REPO = "great-expectations/great_expectations"
 
 
 class GxURL(str, enum.Enum):
@@ -17,15 +18,5 @@ class GxFile(str, enum.Enum):
     CHANGELOG_MD = "docs/docusaurus/docs/changelog.md"
     CHANGELOG_RST = "docs_rtd/changelog.rst"
     TEAMS = ".github/teams.yml"
-    DOCS_DATA_COMPONENT = (
-        "docs/docusaurus/docs/components/_data.jsx"
-    )
+    DOCS_DATA_COMPONENT = "docs/docusaurus/docs/components/_data.jsx"
     DOCS_CONFIG = "docs/docusaurus/docusaurus.config.js"
-
-
-def check_if_in_gx_root() -> None:
-    for constant in GxFile:
-        if not os.path.exists(constant):
-            raise ValueError(
-                f"Could not find '{constant}'; are you sure you're in the root of the OSS repo?"
-            )

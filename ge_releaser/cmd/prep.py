@@ -1,31 +1,24 @@
-import datetime as dt
 import logging
 import os
 from typing import List, Tuple
 
 import click
-import git
-from github.PaginatedList import PaginatedList
 from github.PullRequest import PullRequest
-from github.Repository import Repository
 from packaging import version
 
 from ge_releaser.changelog import ChangelogEntry
-from ge_releaser.cmd.util import checkout_and_update_develop
 from ge_releaser.constants import GxFile, GxURL
-from ge_releaser.git import GitEnvironment
+from ge_releaser.git import GitService
 
 
-def prep(env: GitEnvironment) -> None:
+def prep(git: GitService) -> None:
     click.secho("[prep]", bold=True, fg="blue")
 
-    last_version, release_version = _parse_versions(env.git_repo)
+    last_version, release_version = _parse_versions(git)
 
-    checkout_and_update_develop(env.git_repo)
+    git.checkout_and_pull_trunk()
 
-    release_branch: str = _create_and_checkout_release_branch(
-        env.git_repo, release_version
-    )
+    release_branch: str = _create_and_checkout_release_branch(git, release_version)
     click.secho(" * Created a release branch (1/7)", fg="yellow")
 
     _update_deployment_version_file(release_version)
@@ -34,22 +27,23 @@ def prep(env: GitEnvironment) -> None:
     _update_docs_component(last_version=last_version, release_version=release_version)
     click.secho(" * Updated version in docs data component (3/7)", fg="yellow")
 
-    _update_docs_version_dropdown(last_version=last_version, release_version=release_version)
+    _update_docs_version_dropdown(
+        last_version=last_version, release_version=release_version
+    )
     click.secho(" * Updated version in docs version dropdown (4/7)", fg="yellow")
 
     _update_changelogs(
-        github_repo=env.github_repo,
+        git=git,
         last_version=last_version,
         release_version=release_version,
     )
     click.secho(" * Updated changelogs (5/7)", fg="yellow")
 
-    _commit_changes(env.git_repo)
+    git.stage_all_and_commit("release_prep")
     click.secho(" * Committed changes (6/7)", fg="yellow")
 
     url: str = _create_pr(
-        git_repo=env.git_repo,
-        github_repo=env.github_repo,
+        git=git,
         release_branch=release_branch,
         release_version=release_version,
     )
@@ -59,9 +53,9 @@ def prep(env: GitEnvironment) -> None:
 
 
 def _parse_versions(
-    git_repo: git.Repo,
+    git: GitService,
 ) -> Tuple[str, str]:
-    tags = sorted(git_repo.tags, key=lambda t: t.commit.committed_datetime)
+    tags = git.get_tags()
     release_version = version.parse(str(tags[-1]))
     last_version = version.parse(str(tags[-2]))
 
@@ -70,11 +64,9 @@ def _parse_versions(
     return str(last_version), str(release_version)
 
 
-def _create_and_checkout_release_branch(
-    git_repo: git.Repo, release_version: str
-) -> str:
+def _create_and_checkout_release_branch(git: GitService, release_version: str) -> str:
     branch_name: str = f"release-{release_version}"
-    git_repo.git.checkout("HEAD", b=branch_name)
+    git.create_and_checkout_branch(branch_name)
     return branch_name
 
 
@@ -101,6 +93,7 @@ def _update_docs_component(last_version: str, release_version: str) -> None:
     with open(GxFile.DOCS_DATA_COMPONENT, "w") as f:
         f.write(updated_contents)
 
+
 def _update_docs_version_dropdown(last_version: str, release_version: str) -> None:
     """Updates the docusaurus config file responsible for display of the version dropdown.
 
@@ -122,37 +115,33 @@ def _update_docs_version_dropdown(last_version: str, release_version: str) -> No
 
 
 def _update_changelogs(
-    github_repo: Repository,
+    git: GitService,
     last_version: str,
     release_version: str,
 ) -> None:
-    relevant_prs: List[PullRequest] = _collect_prs_since_last_release(
-        github_repo, last_version
-    )
+    relevant_prs = _collect_prs_since_last_release(git, last_version)
 
-    changelog_entry: ChangelogEntry = ChangelogEntry(relevant_prs)
+    changelog_entry = ChangelogEntry(relevant_prs)
 
     changelog_entry.write(GxFile.CHANGELOG_MD, last_version, release_version)
     changelog_entry.write(GxFile.CHANGELOG_RST, last_version, release_version)
 
 
 def _collect_prs_since_last_release(
-    github_repo: Repository,
+    git: GitService,
     last_version: str,
 ) -> List[PullRequest]:
     # 20220923 - Chetan - Currently, this grabs all PRs from the last release until the moment of program execution.
     # This should be updated so the changelog generation stops once it hits the release commit.
 
-    last_release: dt.datetime = github_repo.get_release(last_version).created_at
+    last_release = git.get_release_timestamp(last_version)
 
-    merged_prs: PaginatedList[PullRequest] = github_repo.get_pulls(
-        base="develop", state="closed", sort="updated", direction="desc"
-    )
+    merged_prs = git.get_merged_prs()
     recent_prs: List[PullRequest] = []
 
     # To ensure we don't accidently exit early, we set a threshold and wait to see a few old PRs before completing iteration
-    counter: int = 0
-    threshold: int = 5
+    counter = 0
+    threshold = 5
 
     for pr in merged_prs:
         if counter >= threshold:
@@ -171,25 +160,17 @@ def _collect_prs_since_last_release(
     return recent_prs
 
 
-def _commit_changes(git_repo: git.Repo) -> None:
-    git_repo.git.add(".")
-    # Bypass pre-commit (if running locally on a dev env)
-    git_repo.git.commit("-m", "release prep", "--no-verify")
-
-
 def _create_pr(
-    git_repo: git.Repo,
-    github_repo: Repository,
+    git: GitService,
     release_branch: str,
     release_version: str,
 ) -> str:
-    git_repo.git.push("--set-upstream", "origin", release_branch)
+    git.push_branch_to_remote(release_branch, set_upstream=True)
 
-    pr: PullRequest = github_repo.create_pull(
+    pr = git.create_pr(
         title=f"[RELEASE] {release_version}",
         body=f"release prep for {release_version}",
         head=release_branch,
-        base="develop",
     )
 
     return os.path.join(GxURL.PULL_REQUESTS, str(pr.number))
@@ -197,7 +178,7 @@ def _create_pr(
 
 def _print_next_steps(url: str) -> None:
     click.secho(
-        f"\n[SUCCESS] Please review, approve, and merge PR before continuing to `publish` command",
+        "\n[SUCCESS] Please review, approve, and merge PR before continuing to `publish` command",
         fg="green",
     )
     click.echo(f"Link to PR: {url}")
