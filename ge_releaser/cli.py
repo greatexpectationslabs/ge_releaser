@@ -2,12 +2,42 @@ import os
 from typing import Optional
 
 import click
+import requests
+from requests.models import HTTPError
 
 from ge_releaser.cmd.prep import prep
 from ge_releaser.cmd.publish import publish
 from ge_releaser.cmd.tag import tag
-from ge_releaser.constants import GITHUB_REPO, check_if_in_gx_root
+from ge_releaser.constants import (
+    GITHUB_REPO,
+    RELEASER_LOCAL_VERSION,
+    RELEASER_REMOTE_VERSION,
+    check_if_in_gx_root,
+)
 from ge_releaser.git import GitEnvironment
+
+
+def check_if_using_latest_version():
+    current_version = _get_current_version()
+    latest_version = _get_latest_version()
+    if current_version != latest_version:
+        raise ValueError(
+            f"Your version of `ge_releaser` is outdated (local: {current_version}, remote: {latest_version}).\nPlease pull down latest changes before continuing."
+        )
+
+
+def _get_current_version() -> str:
+    with open(RELEASER_LOCAL_VERSION) as f:
+        return f.read().strip()
+
+
+def _get_latest_version() -> str:
+    response = requests.get(RELEASER_REMOTE_VERSION)
+    try:
+        response.raise_for_status()
+    except HTTPError as e:
+        raise ValueError("Could not access remote version of `ge_releaser`") from e
+    return response.text.strip()
 
 
 @click.group()
@@ -24,6 +54,7 @@ def cli(ctx: click.Context) -> None:
     assert token is not None, "Must set GITHUB_TOKEN environment variable!"
 
     check_if_in_gx_root()
+    check_if_using_latest_version()
 
     env: GitEnvironment = GitEnvironment(token, GITHUB_REPO)
     ctx.obj = env

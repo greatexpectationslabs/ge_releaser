@@ -1,7 +1,14 @@
 import enum
 import os
+import pathlib
 
-GITHUB_REPO: str = "great-expectations/great_expectations"
+RELEASER_LOCAL_VERSION = str(
+    pathlib.Path(__file__).parent.parent.joinpath("VERSION").resolve()
+)
+RELEASER_REMOTE_VERSION = (
+    "https://raw.githubusercontent.com/greatexpectationslabs/ge_releaser/main/VERSION"
+)
+GITHUB_REPO = "great-expectations/great_expectations"
 
 
 class GxURL(str, enum.Enum):
@@ -17,9 +24,7 @@ class GxFile(str, enum.Enum):
     CHANGELOG_MD = "docs/docusaurus/docs/changelog.md"
     CHANGELOG_RST = "docs_rtd/changelog.rst"
     TEAMS = ".github/teams.yml"
-    DOCS_DATA_COMPONENT = (
-        "docs/docusaurus/docs/components/_data.jsx"
-    )
+    DOCS_DATA_COMPONENT = "docs/docusaurus/docs/components/_data.jsx"
     DOCS_CONFIG = "docs/docusaurus/docusaurus.config.js"
 
 
