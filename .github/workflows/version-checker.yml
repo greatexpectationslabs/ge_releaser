@@ -7,11 +7,16 @@ jobs:
   check:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - id: files
+        uses: jitterbit/get-changed-files@v1
       - name: Check that VERSION file is updated
         run: |
-          git diff ${GITHUB_REF##*/} origin/main --name-only | grep "VERSION"
+          echo ${{ steps.files.outputs.all }} | grep "ge_releaser"
+          if [ $? -ne 0 ]; then
+            exit 0 # No source code changes so exit early
+          fi
+          echo ${{ steps.files.outputs.all }} | grep "VERSION"
           if [ $? -ne 0 ]; then
             echo "Please increment the VERSION file in the root of the project."
-          exit 1
+            exit 1
           fi
