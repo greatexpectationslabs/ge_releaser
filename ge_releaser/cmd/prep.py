@@ -76,7 +76,8 @@ def _update_deployment_version_file(release_version: str) -> None:
 
 
 def _update_docs_component(last_version: str, release_version: str) -> None:
-    """Updates the JSX file in our docs directory responsible for tracking GX and Python versions.
+    """Updates the JSX file in our docs directory responsible for tracking
+    GX and Python versions.
 
     It looks something like this:
     ```jsx
@@ -95,7 +96,8 @@ def _update_docs_component(last_version: str, release_version: str) -> None:
 
 
 def _update_docs_version_dropdown(last_version: str, release_version: str) -> None:
-    """Updates the docusaurus config file responsible for display of the version dropdown.
+    """Updates the docusaurus config file responsible for display of
+    the version dropdown.
 
     It looks something like this:
     ```js
@@ -131,15 +133,17 @@ def _collect_prs_since_last_release(
     git: GitService,
     last_version: str,
 ) -> List[PullRequest]:
-    # 20220923 - Chetan - Currently, this grabs all PRs from the last release until the moment of program execution.
-    # This should be updated so the changelog generation stops once it hits the release commit.
+    # 20220923 - Chetan - Currently, this grabs all PRs from the last release until the
+    # moment of program execution. This should be updated so the changelog generation
+    # stops once it hits the release commit.
 
     last_release = git.get_release_timestamp(last_version)
 
     merged_prs = git.get_merged_prs()
     recent_prs: List[PullRequest] = []
 
-    # To ensure we don't accidently exit early, we set a threshold and wait to see a few old PRs before completing iteration
+    # To ensure we don't accidently exit early, we set a threshold and wait to see a
+    # few old PRs before completing iteration
     counter = 0
     threshold = 5
 
@@ -178,7 +182,8 @@ def _create_pr(
 
 def _print_next_steps(url: str) -> None:
     click.secho(
-        "\n[SUCCESS] Please review, approve, and merge PR before continuing to `publish` command",
+        "\n[SUCCESS] Please review, approve, and merge PR before continuing "
+        "to `publish` command",
         fg="green",
     )
     click.echo(f"Link to PR: {url}")

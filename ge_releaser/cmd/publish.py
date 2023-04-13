@@ -51,7 +51,8 @@ def _print_next_steps() -> None:
     click.secho(" * Created release page (1/1)", fg="yellow")
 
     click.secho(
-        "\n[SUCCESS] Please review and publish your release. Congratulations, you've finished the release process :)",
+        "\n[SUCCESS] Please review and publish your release. "
+        "Congratulations, you've finished the release process :)",
         fg="green",
     )
     click.echo(f"Link to releases: {GxURL.RELEASES}")

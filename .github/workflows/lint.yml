@@ -1,0 +1,23 @@
+name: "Lint"
+
+on:
+  pull_request:
+
+jobs:
+  lint-all:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/actions/setup-python
+
+      - name: Install dependencies
+        run: pip install -r requirements-dev.txt
+
+      - name: Lint all
+        run: |
+          EXIT_STATUS=0
+          black . || EXIT_STATUS=$?
+          ruff . --fix || EXIT_STATUS=$?
+          mypy . || EXIT_STATUS=$?
+          exit $EXIT_STATUS
