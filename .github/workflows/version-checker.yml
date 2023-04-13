@@ -1,4 +1,4 @@
-# Validate that any changes to source code update
+# Validate that any changes to source code result in an updated version
 name: "Version Checker"
 on:
   push:
