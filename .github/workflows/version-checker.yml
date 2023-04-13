@@ -11,11 +11,13 @@ jobs:
         uses: jitterbit/get-changed-files@v1
       - name: Check that VERSION file is updated
         run: |
-          echo ${{ steps.files.outputs.all }} | grep "ge_releaser"
+          changed_files=${{ steps.files.outputs.all }}
+          echo $changed_files
+          echo $changed_files | grep "ge_releaser"
           if [ $? -ne 0 ]; then
             exit 0 # No source code changes so exit early
           fi
-          echo ${{ steps.files.outputs.all }} | grep "VERSION"
+          echo $changed_files | grep "VERSION"
           if [ $? -ne 0 ]; then
             echo "Please increment the VERSION file in the root of the project."
             exit 1
