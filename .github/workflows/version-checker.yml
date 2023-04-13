@@ -7,11 +7,11 @@ jobs:
   check:
     runs-on: ubuntu-latest
     steps:
-    - name: Check that VERSION file is updated
-    - uses: actions/checkout@v3
-    - run: |
-        git diff ${GITHUB_REF##*/} origin/main --name-only | grep "VERSION"
-        if [ $? -ne 0 ]; then
-        echo "Please increment the VERSION file in the root of the project."
+      - uses: actions/checkout@v3
+      - name: Check that VERSION file is updated
+        run: |
+          git diff ${GITHUB_REF##*/} origin/main --name-only | grep "VERSION"
+          if [ $? -ne 0 ]; then
+            echo "Please increment the VERSION file in the root of the project."
           exit 1
-        fi
+          fi
