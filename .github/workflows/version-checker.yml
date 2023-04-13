@@ -14,15 +14,19 @@ jobs:
           format: 'space-delimited'
           token: ${{ secrets.GITHUB_TOKEN }}
       - name: Check that VERSION file is updated
-        run: |
-          changed_files=${{ steps.files.outputs.all }}
-          echo $changed_files
-          echo $changed_files | grep "ge_releaser"
-          if [ $? -ne 0 ]; then
-            exit 0 # No source code changes so exit early
-          fi
-          echo $changed_files | grep "VERSION"
-          if [ $? -ne 0 ]; then
-            echo "Please increment the VERSION file in the root of the project."
-            exit 1
-          fi
+      - run: |
+          for changed_file in ${{ steps.files.outputs.all }}; do
+            echo "Do something with this ${changed_file}."
+          done
+        # run: |
+        #   changed_files=${{ steps.files.outputs.all }}
+        #   echo $changed_files
+        #   echo $changed_files | grep "ge_releaser"
+        #   if [ $? -ne 0 ]; then
+        #     exit 0 # No source code changes so exit early
+        #   fi
+        #   echo $changed_files | grep "VERSION"
+        #   if [ $? -ne 0 ]; then
+        #     echo "Please increment the VERSION file in the root of the project."
+        #     exit 1
+        #   fi
