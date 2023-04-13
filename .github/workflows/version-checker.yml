@@ -9,6 +9,8 @@ jobs:
     steps:
       - id: files
         uses: jitterbit/get-changed-files@v1
+        with:
+          format: ''
       - name: Check that VERSION file is updated
         run: |
           changed_files=${{ steps.files.outputs.all }}
