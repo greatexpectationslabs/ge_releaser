@@ -1,33 +1,10 @@
-import os
-from typing import Optional
-
 import click
 
 from ge_releaser.cmd.prep import prep
 from ge_releaser.cmd.publish import publish
 from ge_releaser.cmd.tag import tag
-from ge_releaser.constants import GITHUB_REPO, REMOTE, TRUNK, GxFile
 from ge_releaser.git import GitService
-
-
-def _check_if_in_gx_root() -> None:
-    for constant in GxFile:
-        if not os.path.exists(constant):
-            raise ValueError(
-                f"Could not find '{constant}'; are you sure you're in the root of the OSS repo?"
-            )
-
-
-def setup(ctx: click.Context) -> None:
-    token: Optional[str] = os.environ.get("GITHUB_TOKEN")
-    assert token is not None, "Must set GITHUB_TOKEN environment variable!"
-
-    _check_if_in_gx_root()
-
-    git = GitService(
-        github_token=token, repo_name=GITHUB_REPO, trunk=TRUNK, remote=REMOTE
-    )
-    ctx.obj = git
+from ge_releaser.utils import setup
 
 
 @click.group()

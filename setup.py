@@ -3,6 +3,12 @@ from typing import List
 import setuptools
 
 
+def get_version() -> str:
+    with open("VERSION") as f:
+        version = f.read().strip()
+    return version
+
+
 def get_requirements() -> List[str]:
     with open("requirements.txt") as f:
         requirements = f.read().splitlines()
@@ -11,7 +17,7 @@ def get_requirements() -> List[str]:
 
 setuptools.setup(
     name="ge_releaser",
-    version="0.1.0",
+    version=get_version(),
     install_requires=get_requirements(),
     entry_points="""
       [console_scripts]

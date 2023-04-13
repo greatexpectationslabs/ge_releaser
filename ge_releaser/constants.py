@@ -1,5 +1,12 @@
 import enum
+import pathlib
 
+RELEASER_LOCAL_VERSION = str(
+    pathlib.Path(__file__).parent.parent.joinpath("VERSION").resolve()
+)
+RELEASER_REMOTE_VERSION = (
+    "https://raw.githubusercontent.com/greatexpectationslabs/ge_releaser/main/VERSION"
+)
 TRUNK = "develop"
 REMOTE = "origin"
 GITHUB_REPO = "great-expectations/great_expectations"
