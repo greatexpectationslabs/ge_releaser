@@ -1,7 +1,7 @@
 # Validate that any changes to source code result in an updated version
 name: "Version Checker"
 on:
-  pull_request:
+  push
 
 jobs:
   check:
