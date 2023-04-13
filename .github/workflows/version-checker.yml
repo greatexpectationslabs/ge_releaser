@@ -10,6 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name : Check that VERSION file is updated
+    - uses: actions/checkout@v3
       run: |
         git diff @ origin/main --name-only | grep "VERSION"
         if [ $? -ne 0 ]; then

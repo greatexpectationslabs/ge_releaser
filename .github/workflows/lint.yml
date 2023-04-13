@@ -9,12 +9,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - uses: ./.github/actions/setup-python
-
       - name: Install dependencies
         run: pip install -r requirements-dev.txt
-
-      - name: Lint all
+      - name: Lint
         run: |
           EXIT_STATUS=0
           black . || EXIT_STATUS=$?
