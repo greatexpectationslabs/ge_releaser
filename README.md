@@ -63,6 +63,9 @@ Make sure to ask the team about any necessary PR's that might need to go in befo
 curl -s https://api.github.com/repos/great-expectations/great_expectations/pulls | jq '.[] | select(.auto_merge.merge_method == "squash") | {title: .title, author: .user.login, date: .created_at, link: .html_url}'
 ```
 #### prep
+
+NOTE: While running the prep stage any untracked files will be committed and pushed to the repo. Please make sure you have a clean repo before running this command! Including any credentials e.g. GCP credentials.
+
 Run `ge_releaser prep`.
 ![prep](./assets/prep.png)
 - This will generate changelogs, update relevant files, and draft a PR titled `[RELEASE] <RELEASE_NUMBER>`.
