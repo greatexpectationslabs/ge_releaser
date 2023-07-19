@@ -20,7 +20,8 @@ def check_if_in_gx_root() -> None:
     for constant in GxFile:
         if not os.path.exists(constant):
             raise ValueError(
-                f"Could not find '{constant}'; are you sure you're in the root of the OSS repo?"
+                f"Could not find '{constant}'; are you sure you're in the root "
+                "of the OSS repo?"
             )
 
 
@@ -29,7 +30,9 @@ def check_if_using_latest_version() -> None:
     latest_version = _get_latest_version()
     if current_version != latest_version:
         raise ValueError(
-            f"Your version of `ge_releaser` is outdated (local: {current_version}, remote: {latest_version}).\nPlease pull down latest changes before continuing."
+            "Your version of `ge_releaser` is outdated "
+            "(local: {current_version}, remote: {latest_version})."
+            "\nPlease pull down latest changes before continuing."
         )
 
 

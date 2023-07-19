@@ -25,7 +25,9 @@ class ChangelogCommit:
 
         title = pr.title.strip()
         try:
-            type_, self.desc = re.match(r"\[([a-zA-Z]+)\] ?(.*)", title).group(1, 2)
+            desc: str
+            type_, desc = re.match(r"\[([a-zA-Z]+)\] ?(.*)", title).group(1, 2)  # type: ignore[union-attr]
+            self.desc = desc
             type_ = type_.upper()
             self.pr_type = (
                 ChangelogCategory[type_]
