@@ -5,7 +5,6 @@ import git
 import github
 from github.PullRequest import PullRequest
 
-
 class GitService:
     def __init__(
         self,
@@ -36,8 +35,22 @@ class GitService:
         self._git.git.checkout(self._trunk)
         self._git.git.pull(self._remote, self._trunk)
 
+    def check_for_untracked_files(self) -> bool:
+        return bool(self._git.git.untracked_files)
+
+    def verify_no_untracked_files(self) -> None:
+        if self.check_for_untracked_files():
+            raise ValueError("There are untracked files. Please make sure to run this step with a clean repo.")
+
     def stage_all_and_commit(self, message: str) -> None:
-        self._git.git.add(".")
+        files_to_add = (
+            "docs/docusaurus/docs/changelog.md",
+            "docs/docusaurus/docs/components/_data.jsx",
+            "docs/docusaurus/docusaurus.config.js",
+            "docs_rtd/changelog.rst",
+            "great_expectations/deployment_version",
+        )
+        self._git.git.add(files_to_add)
         self._git.git.commit("-m", message, "--no-verify")
 
     def get_release_timestamp(self, version: str) -> dt.datetime:
