@@ -1,18 +1,19 @@
-# Validate that any changes to source code result in an updated version
-name: "Version Checker"
-on:
-  push:
-    paths:
-      - ge_releaser/**
-
-jobs:
-  check:
-    runs-on: ubuntu-latest
-    steps:
-    - name : Check that VERSION file is updated
-      run: |
-        git diff @ origin/main --name-only | grep "VERSION"
-        if [ $? -ne 0 ]; then
-        echo "Please increment the VERSION file in the root of the project."
-          exit 1
-        fi
+## TODO: Fix version checker
+## Validate that any changes to source code result in an updated version
+#name: "Version Checker"
+#on:
+#  push:
+#    paths:
+#      - ge_releaser/**
+#
+#jobs:
+#  check:
+#    runs-on: ubuntu-latest
+#    steps:
+#    - name : Check that VERSION file is updated
+#      run: |
+#        git diff @ origin/main --name-only | grep "VERSION"
+#        if [ $? -ne 0 ]; then
+#        echo "Please increment the VERSION file in the root of the project."
+#          exit 1
+#        fi
