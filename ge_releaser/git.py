@@ -5,7 +5,7 @@ import git
 import github
 from github.PullRequest import PullRequest
 
-from ge_releaser.constants import GxFile, FILES_TO_COMMIT
+from ge_releaser.constants import FILES_TO_COMMIT
 
 
 class GitService:
