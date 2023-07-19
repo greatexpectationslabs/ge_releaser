@@ -27,3 +27,12 @@ class GxFile(str, enum.Enum):
     TEAMS = ".github/teams.yml"
     DOCS_DATA_COMPONENT = "docs/docusaurus/docs/components/_data.jsx"
     DOCS_CONFIG = "docs/docusaurus/docusaurus.config.js"
+
+
+FILES_TO_COMMIT = (
+    GxFile.CHANGELOG_MD,
+    GxFile.DOCS_DATA_COMPONENT,
+    GxFile.DOCS_CONFIG,
+    GxFile.CHANGELOG_RST,
+    GxFile.DEPLOYMENT_VERSION,
+)
