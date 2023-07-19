@@ -14,8 +14,6 @@ from ge_releaser.git import GitService
 def prep(git: GitService) -> None:
     click.secho("[prep]", bold=True, fg="blue")
 
-    git.verify_no_untracked_files()
-
     last_version, release_version = _parse_versions(git)
 
     git.checkout_and_pull_trunk()

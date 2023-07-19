@@ -57,4 +57,5 @@ def setup(ctx: click.Context) -> None:
     git = GitService(
         github_token=token, repo_name=GITHUB_REPO, trunk=TRUNK, remote=REMOTE
     )
+    git.verify_no_untracked_files()
     ctx.obj = git
