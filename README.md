@@ -7,14 +7,14 @@ A CLI tool built to streamline the process of cutting releases each week in the 
 ## Installation
 ```bash
 # Preferably run all this in a venv
-git clone git@github.com:superconductive/ge_releaser.git
+git clone git@github.com:greatexpectationslabs/ge_releaser.git
 cd ge_releaser
 pip install -e .
 ```
 
 ```bash
 # Alternative
-gh repo clone superconductive/ge_releaser
+gh repo clone greatexpectationslabs/ge_releaser
 cd ge_releaser
 python3 -m venv .venv
 source .venv/bin/activate
