@@ -39,7 +39,7 @@ class GitService:
         self._git.git.pull(self._remote, self._trunk)
 
     def _check_for_untracked_files(self) -> bool:
-        return bool(self._git.untracked_files or self._git.unstaged_files)
+        return bool(self._git.untracked_files)
 
     def verify_no_untracked_files(self) -> None:
         if self._check_for_untracked_files():
