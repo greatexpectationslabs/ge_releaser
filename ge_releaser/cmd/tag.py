@@ -34,5 +34,6 @@ def _print_next_steps(version_number: str) -> None:
         fg="green",
     )
     click.echo(f"Link to tag: {tag_url}")
-    click.echo(f"Link to Azure build: {GxURL.AZURE_BUILDS}")
+    # this is here to make it easier to copy-paste the link
+    click.echo(f"Link to Github Actions build: {GxURL.GITHUB_ACTIONS_BUILD}")
     click.echo(f"Link to PyPI page: {GxURL.PYPI_PAGE}")
