@@ -18,7 +18,6 @@ class ChangelogCategory(enum.Enum):
 
 class ChangelogCommit:
     def __init__(self, pr: PullRequest) -> None:
-
         teams: str
         with open(GxFile.TEAMS) as f:
             teams = f.read().strip()

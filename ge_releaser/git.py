@@ -43,10 +43,12 @@ class GitService:
 
     def verify_no_untracked_files(self) -> None:
         if self._check_for_untracked_files():
-            raise ValueError("There are untracked files. Please make sure to run this step with a clean repo.")
+            raise ValueError(
+                "There are untracked files. Please make sure to run this step with a clean repo."
+            )
 
     def stage_all_and_commit(self, message: str) -> None:
-        self._git.git.add([file_class.value for file_class in FILES_TO_COMMIT]) 
+        self._git.git.add([file_class.value for file_class in FILES_TO_COMMIT])
         self._git.git.commit("-m", message, "--no-verify")
 
     def get_release_timestamp(self, version: str) -> dt.datetime:

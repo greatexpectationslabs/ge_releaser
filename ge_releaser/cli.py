@@ -23,10 +23,17 @@ def cli(ctx: click.Context) -> None:
 @cli.command(name="tag", help="Tag the new release")
 @click.argument("commit", type=str, nargs=1, required=True)
 @click.argument("version_number", type=str, nargs=1, required=True)
-@click.option('--pre-release', 'is_pre_release', default=False, is_flag=True)
+@click.option("--pre-release", "is_pre_release", default=False, is_flag=True)
 @click.pass_obj
-def tag_cmd(git: GitService, commit: str, version_number: str, is_pre_release: bool) -> None:
-    tag(git=git, commit=commit, version_number=version_number, is_pre_release=is_pre_release)
+def tag_cmd(
+    git: GitService, commit: str, version_number: str, is_pre_release: bool
+) -> None:
+    tag(
+        git=git,
+        commit=commit,
+        version_number=version_number,
+        is_pre_release=is_pre_release,
+    )
 
 
 @cli.command(

@@ -7,8 +7,12 @@ from ge_releaser.constants import GxURL
 from ge_releaser.git import GitService
 
 
-def tag(git: GitService, commit: str, version_number: str, is_pre_release: bool) -> None:
-    _check_version_validity(version_number=version_number, is_pre_release=is_pre_release)
+def tag(
+    git: GitService, commit: str, version_number: str, is_pre_release: bool
+) -> None:
+    _check_version_validity(
+        version_number=version_number, is_pre_release=is_pre_release
+    )
     click.secho("[tag]", bold=True, fg="blue")
 
     _tag_release_commit(git, commit, version_number)
@@ -24,10 +28,14 @@ def _check_version_validity(version_number: str, is_pre_release: bool) -> None:
     v = version.parse(version_number)
 
     if is_pre_release and not v.is_prerelease:
-        raise ValueError("Passed in --pre-release flag but did not provide a version with a pre-release suffix ('a', 'b', 'rc')")
+        raise ValueError(
+            "Passed in --pre-release flag but did not provide a version with a pre-release suffix ('a', 'b', 'rc')"
+        )
 
     if not is_pre_release and v.is_prerelease:
-        raise ValueError("Passed in a pre-release version but did not turn on the --pre-release flag")
+        raise ValueError(
+            "Passed in a pre-release version but did not turn on the --pre-release flag"
+        )
 
 
 def _tag_release_commit(git: GitService, commit: str, release_version: str) -> None:
