@@ -13,13 +13,13 @@ def tag(
     _check_version_validity(
         version_number=version_number, is_stable_release=is_stable_release 
     )
-    # click.secho("[tag]", bold=True, fg="blue")
+    click.secho("[tag]", bold=True, fg="blue")
 
-    # _tag_release_commit(git, commit, version_number)
-    # click.secho(f" * Tagged commit '{commit}' on develop (1/2)", fg="yellow")
+    _tag_release_commit(git, commit, version_number)
+    click.secho(f" * Tagged commit '{commit}' on develop (1/2)", fg="yellow")
 
-    # git.push_branch_to_remote(branch=version_number, set_upstream=False)
-    # click.secho(" * Pushed tag to remote (2/2)", fg="yellow")
+    git.push_branch_to_remote(branch=version_number, set_upstream=False)
+    click.secho(" * Pushed tag to remote (2/2)", fg="yellow")
 
     _print_next_steps(version_number=version_number, is_stable_release=is_stable_release)
 
