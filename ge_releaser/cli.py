@@ -26,13 +26,13 @@ def cli(ctx: click.Context) -> None:
 @click.option("--stable", "is_stable_release", default=False, is_flag=True)
 @click.pass_obj
 def tag_cmd(
-    git: GitService, commit: str, version_number: str, is_stable_release: bool 
+    git: GitService, commit: str, version_number: str, is_stable_release: bool
 ) -> None:
     tag(
         git=git,
         commit=commit,
         version_number=version_number,
-        is_stable_release=is_stable_release
+        is_stable_release=is_stable_release,
     )
 
 

@@ -11,7 +11,7 @@ def tag(
     git: GitService, commit: str, version_number: str, is_stable_release: bool
 ) -> None:
     _check_version_validity(
-        version_number=version_number, is_stable_release=is_stable_release 
+        version_number=version_number, is_stable_release=is_stable_release
     )
     click.secho("[tag]", bold=True, fg="blue")
 
@@ -21,7 +21,7 @@ def tag(
     git.push_branch_to_remote(branch=version_number, set_upstream=False)
     click.secho(" * Pushed tag to remote (2/2)", fg="yellow")
 
-    _print_next_steps(version_number=version_number, is_stable_release=is_stable_release)
+    _print_next_steps(version_number=version_number)
 
 
 def _check_version_validity(version_number: str, is_stable_release: bool) -> None:
@@ -47,13 +47,10 @@ def _tag_release_commit(git: GitService, commit: str, release_version: str) -> N
     git.tag_commit(commit=commit, version=release_version)
 
 
-def _print_next_steps(version_number: str, is_stable_release: bool) -> None:
+def _print_next_steps(version_number: str) -> None:
     tag_url = os.path.join(GxURL.RELEASES, "tag", version_number)
 
-    if is_stable_release:
-        msg = "Please wait for the build process and PyPI publishing to complete before moving to the `prep` cmd."
-    else:
-        msg = "No additional steps are required when publishing a pre-release."
+    msg = "Please wait for the build process and PyPI publishing to complete before moving to the `prep` cmd."
 
     click.secho(f"\n{msg}", fg="green")
     click.echo(f"Link to tag: {tag_url}")
