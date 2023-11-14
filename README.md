@@ -53,10 +53,9 @@ The tool is designed to do pretty much EVERYTHING for you. Do not run isolated `
 #### tag
 Run `ge_releaser tag "<commit_hash>" <release_version>`.
 ![tag](./assets/tag.png)
-- This will tag that particular commit with your desired release SemVer.
+- This will tag that particular commit with your desired release SemVer; note that the default will be a pre-release candidate (use `--stable` for a proper release).
   - If you wish to tag the latest commit on the trunk, just use `HEAD` instead of a commit hash.
 - **IMPORTANT** - Wait until the Azure pipeline finishes running and confirm proper publishing to PyPI.
-- **IMPORTANT** - If releasing a pre-release candidate, please use the `--pre-release` boolean flag.
 
 Make sure to ask the team about any necessary PR's that might need to go in before running this command.
 ```bash

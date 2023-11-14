@@ -8,33 +8,33 @@ from ge_releaser.git import GitService
 
 
 def tag(
-    git: GitService, commit: str, version_number: str, is_pre_release: bool
+    git: GitService, commit: str, version_number: str, is_stable_release: bool
 ) -> None:
     _check_version_validity(
-        version_number=version_number, is_pre_release=is_pre_release
+        version_number=version_number, is_stable_release=is_stable_release 
     )
-    click.secho("[tag]", bold=True, fg="blue")
+    # click.secho("[tag]", bold=True, fg="blue")
 
-    _tag_release_commit(git, commit, version_number)
-    click.secho(f" * Tagged commit '{commit}' on develop (1/2)", fg="yellow")
+    # _tag_release_commit(git, commit, version_number)
+    # click.secho(f" * Tagged commit '{commit}' on develop (1/2)", fg="yellow")
 
-    git.push_branch_to_remote(branch=version_number, set_upstream=False)
-    click.secho(" * Pushed tag to remote (2/2)", fg="yellow")
+    # git.push_branch_to_remote(branch=version_number, set_upstream=False)
+    # click.secho(" * Pushed tag to remote (2/2)", fg="yellow")
 
-    _print_next_steps(version_number=version_number, is_pre_release=is_pre_release)
+    _print_next_steps(version_number=version_number, is_stable_release=is_stable_release)
 
 
-def _check_version_validity(version_number: str, is_pre_release: bool) -> None:
+def _check_version_validity(version_number: str, is_stable_release: bool) -> None:
     v = version.parse(version_number)
 
-    if is_pre_release and not v.is_prerelease:
+    if is_stable_release and v.is_prerelease:
         raise ValueError(
-            "Passed in --pre-release flag but did not provide a version with a pre-release suffix ('a', 'b', 'rc')"
+            "Passed in --stable flag but provided an invalid version with a pre-release suffix"
         )
 
-    if not is_pre_release and v.is_prerelease:
+    if not is_stable_release and not v.is_prerelease:
         raise ValueError(
-            "Passed in a pre-release version but did not turn on the --pre-release flag"
+            "Passed in a stable version but did not turn on the --stable flag"
         )
 
 
@@ -47,13 +47,13 @@ def _tag_release_commit(git: GitService, commit: str, release_version: str) -> N
     git.tag_commit(commit=commit, version=release_version)
 
 
-def _print_next_steps(version_number: str, is_pre_release: bool) -> None:
+def _print_next_steps(version_number: str, is_stable_release: bool) -> None:
     tag_url = os.path.join(GxURL.RELEASES, "tag", version_number)
 
-    if is_pre_release:
-        msg = "No additional steps are required when publishing a pre-release."
-    else:
+    if is_stable_release:
         msg = "Please wait for the build process and PyPI publishing to complete before moving to the `prep` cmd."
+    else:
+        msg = "No additional steps are required when publishing a pre-release."
 
     click.secho(f"\n{msg}", fg="green")
     click.echo(f"Link to tag: {tag_url}")
