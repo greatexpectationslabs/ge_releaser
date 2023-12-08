@@ -49,7 +49,6 @@ def _get_latest_version() -> str:
 
 def setup(ctx: click.Context) -> None:
     token: Optional[str] = os.environ.get("GITHUB_TOKEN")
-
     assert token is not None, "Must set GITHUB_TOKEN environment variable!"
 
     trunk_override: Optional[str] = os.environ.get("GX_RELEASE_TRUNK")
