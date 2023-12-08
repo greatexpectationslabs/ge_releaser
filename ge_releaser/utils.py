@@ -10,7 +10,6 @@ from ge_releaser.constants import (
     RELEASER_LOCAL_VERSION,
     RELEASER_REMOTE_VERSION,
     REMOTE,
-    PRE_V1_TRUNK,
     TRUNK,
     GxFile,
 )
