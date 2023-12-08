@@ -40,6 +40,7 @@ The tool is designed to do pretty much EVERYTHING for you. Do not run isolated `
 ## Walkthrough
 
 `ge_releaser` acts as an abstraction on top of our standard manual release process. While the following steps should get you creating releases with ease, it is also important to understand what is happening under the hood. For each of the primary commands that `ge_releaser` offers, the individual manual steps taken by the machine are noted below. Although you shouldn't have to use them, it may be handy if debugging is required.
+> :warning: Please note that if the release is for a major or minor version, the docs will need to be versioned manually. Please see the [versioning instructions](https://github.com/great-expectations/great_expectations/tree/develop/docs/docusaurus#versioning) for the steps to follow.
 
 ## CLI Process
 
