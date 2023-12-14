@@ -16,7 +16,7 @@ def tag(
     click.secho("[tag]", bold=True, fg="blue")
 
     _tag_release_commit(git, commit, version_number)
-    click.secho(f" * Tagged commit '{commit}' on develop (1/2)", fg="yellow")
+    click.secho(f" * Tagged commit '{commit}' on {git.trunk} (1/2)", fg="yellow")
 
     git.push_branch_to_remote(branch=version_number, set_upstream=False)
     click.secho(" * Pushed tag to remote (2/2)", fg="yellow")
@@ -40,8 +40,9 @@ def _check_version_validity(version_number: str, is_stable_release: bool) -> Non
 
 def _tag_release_commit(git: GitService, commit: str, release_version: str) -> None:
     if not git.check_if_commit_is_part_of_trunk(commit):
+        # TODO: make git._trunk public
         raise ValueError(
-            f"Selected commit {commit} is not a part of the 'develop' branch!"
+            f"Selected commit {commit} is not a part of the '{git.trunk}' branch!"
         )
 
     git.tag_commit(commit=commit, version=release_version)

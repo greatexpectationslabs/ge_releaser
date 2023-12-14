@@ -146,3 +146,8 @@ Specifically:
 - Send a draft message (to be reviewed by the team) to `#topic-great_expectations`, with the message that will be sent in the community Slack.
 - Send the reviewed meesage to the community Slack channel `#announcements`.
 - Request emoji signal boosting from the team in private Slack channel `#topic-great_expectations`.
+
+#### Override the default trunk value
+
+If doing an pre-v1 bugfix you may need to change the trunk value to something other than `develop`.
+`ge_releaser` will check for an environment variable called `GE_RELEASE_TRUNK` and use this if it is set instead of `develop`.

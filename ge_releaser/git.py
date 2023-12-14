@@ -24,6 +24,10 @@ class GitService:
         self._trunk = trunk
         self._remote = remote
 
+    @property
+    def trunk(self) -> str:
+        return self._trunk
+
     def get_tags(self) -> List[git.Tag]:
         return sorted(self._git.tags, key=lambda t: t.commit.committed_datetime)
 
