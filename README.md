@@ -44,31 +44,64 @@ The tool is designed to do pretty much EVERYTHING for you. Do not run isolated `
 
 ## CLI Process
 
-### Prework
+### Prereqs
 - Install and setup the tool
   - Install the tool using the above instructions.
   - Create a [personal access GitHub token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token), unless you already have one. Create a "classic" token, currently "Fine-grained tokens" are not supported. Give it `repo` permissions.
   - Authorize it for use with [SAML SSO](https://docs.github.com/en/enterprise-cloud@latest/authentication/authenticating-with-saml-single-sign-on/authorizing-a-personal-access-token-for-use-with-saml-single-sign-on), unless this has already been done previously.
-  - Save that token with `export GITHUB_TOKEN=...`.
+  - 
 
-#### tag
-Run `ge_releaser tag "<commit_hash>" <release_version>`.
-![tag](./assets/tag.png)
-- This will tag that particular commit with your desired release SemVer; note that the default will be a pre-release candidate (use `--stable` for a proper release).
-  - If you wish to tag the latest commit on the trunk, just use `HEAD` instead of a commit hash.
-- **IMPORTANT** - Wait until the Azure pipeline finishes running and confirm proper publishing to PyPI.
+```
+export GITHUB_TOKEN=<token>
+```
+
+- (Optional) Select trunk
+  - If not releasing from `develop`, you'll need:
+
+
+```
+export GE_RELEASE_TRUNK=0.18.x
+```
+
+
+
+#### Collaborate
 
 Make sure to ask the team about any necessary PR's that might need to go in before running this command.
+
+#### tag
+
+1. Run the tag subcommand:
+
+```
+ge_releaser tag --stable "<commit_hash>" "<release_version>"
+
+# Examples:
+ge_releaser tag --stable HEAD 0.18.8
+ge_releaser tag --stable eb548b9b58bed229e601f2fe60c4767bcfca8c1d 0.18.8
+```
+
+
+
+![tag](./assets/tag.png)
+
+2. **IMPORTANT** - Wait until the [PyPi Deployment](https://github.com/great-expectations/great_expectations/deployments/pypi) finishes and version is published to the [PyPi page](https://pypi.org/project/great-expectations/#history)
+
+
 ```bash
 # Shell command to check if any PR's are set to automerge (requires jq)
 curl -s https://api.github.com/repos/great-expectations/great_expectations/pulls | jq '.[] | select(.auto_merge.merge_method == "squash") | {title: .title, author: .user.login, date: .created_at, link: .html_url}'
 ```
 #### prep
 
-NOTE: While running the prep stage any untracked files will be committed and pushed to the repo. Please make sure you have a clean repo before running this command! Including any credentials e.g. GCP credentials.
+1. Ensure there are **no** untracked files will be committed and pushed to the repo, such as credentials
 
-Run `ge_releaser prep`.
+```
+ge_releaser prep
+```
+
 ![prep](./assets/prep.png)
+
 - This will generate changelogs, update relevant files, and draft a PR titled `[RELEASE] <RELEASE_NUMBER>`.
 - Review the contents of this PR and ensure it looks appropriate before merging.
   - Check that the new changelog entry only contains changes that have transpired between the last release and this current one.
@@ -76,19 +109,14 @@ Run `ge_releaser prep`.
   - NOTE: This process may include some additional entries (if the release commit selected is before HEAD). If so, please remove them to ensure an accurate changelog.
 
 #### publish
-Run `ge_releaser publish`.
-![publish](./assets/publish.png)
-- This command will take the changelog notes generated from the previous step and write them to our GitHub Releases page.
+```
+ge_releaser publish
+```
 
-#### Yanking Releases
-- Although it shouldn't be a common occurrence due to our CI, there may be situations that necessitate the removal or yanking of a release.
-- In the case a release needs to be yanked, please take the following steps:
-  1. Patch the issue and release a new version (following all the steps noted above).
-  2. Pair with a PyPI maintainer with "Owner" privileges (as of 0.16.6, James, Don, and Chetan are owners).
-    - Navigate to `Your account` -> `great_expectations` -> `Releases`.
-    - Click the `Options` drop-down for the target release and select `Yank`.
-    - Omit the `Reason` field and submit.
-  3. Draft a community announcement, have the team review it in `#topic-great_expectations`, and send the reviewed message to the community Slack channel `#announcements`.
+
+![publish](./assets/publish.png)
+
+- This command will take the changelog notes generated from the previous step and write them to our GitHub Releases page.
 
 #### Community Announcement
 - Draft a message to the community and send it in the OSS Slack channel.
@@ -112,6 +140,10 @@ Specifically:
 - PRs should be written in the present tense
 - The PR numbers should appear in parenthesis and be linked to the PR
 - Contributors are credited with (thanks @username)
+
+
+
+## Appendix
 
 ### Manual Process
 
@@ -151,3 +183,20 @@ Specifically:
 
 If doing an pre-v1 bugfix you may need to change the trunk value to something other than `develop`.
 `ge_releaser` will check for an environment variable called `GE_RELEASE_TRUNK` and use this if it is set instead of `develop`.
+
+
+
+#### Yanking Releases
+
+- Although it shouldn't be a common occurrence due to our CI, there may be situations that necessitate the removal or yanking of a release.
+
+- In the case a release needs to be yanked, please take the following steps:
+
+  1. Patch the issue and release a new version (following all the steps noted above).
+  2. Pair with a PyPI maintainer with "Owner" privileges (as of 0.16.6, James, Don, and Chetan are owners).
+
+    - Navigate to `Your account` -> `great_expectations` -> `Releases`.
+    - Click the `Options` drop-down for the target release and select `Yank`.
+    - Omit the `Reason` field and submit.
+
+  3. Draft a community announcement, have the team review it in `#topic-great_expectations`, and send the reviewed message to the community Slack channel `#announcements`.
