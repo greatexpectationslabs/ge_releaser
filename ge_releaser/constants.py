@@ -22,7 +22,7 @@ class GxURL(str, enum.Enum):
 
 class GxFile(str, enum.Enum):
     DEPLOYMENT_VERSION = "great_expectations/deployment_version"
-    CHANGELOG_MD = "docs/docusaurus/docs/changelog.md"
+    CHANGELOG_MD = "docs/docusaurus/docs/oss/changelog.md"
     CHANGELOG_RST = "docs_rtd/changelog.rst"
     TEAMS = ".github/teams.yml"
     DOCS_DATA_COMPONENT = "docs/docusaurus/docs/components/_data.jsx"
