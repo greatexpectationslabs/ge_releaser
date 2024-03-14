@@ -31,7 +31,8 @@ class GxFile(str, enum.Enum):
 
 
 FILES_TO_COMMIT = (
-    GxFile.CHANGELOG_MD,
+    GxFile.CHANGELOG_MD_V1,
+    GxFile.CHANGELOG_MD_V0,
     GxFile.DOCS_DATA_COMPONENT,
     GxFile.DOCS_CONFIG,
     GxFile.CHANGELOG_RST,
