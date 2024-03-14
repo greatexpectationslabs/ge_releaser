@@ -32,7 +32,7 @@ def _create_release(git: GitService, release_version: str, draft: bool) -> None:
 
 
 def _gather_release_notes(release_version: str) -> List[str]:
-    with open(GxFile.CHANGELOG_MD, "r") as f:
+    with open(GxFile.CHANGELOG_MD_V1, "r") as f:
         contents: List[str] = f.readlines()
 
     start: int = 0
