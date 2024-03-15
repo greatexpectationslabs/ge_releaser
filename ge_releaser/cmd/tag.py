@@ -40,7 +40,6 @@ def _check_version_validity(version_number: str, is_stable_release: bool) -> Non
 
 def _tag_release_commit(git: GitService, commit: str, release_version: str) -> None:
     if not git.check_if_commit_is_part_of_trunk(commit):
-        # TODO: make git._trunk public
         raise ValueError(
             f"Selected commit {commit} is not a part of the '{git.trunk}' branch!"
         )

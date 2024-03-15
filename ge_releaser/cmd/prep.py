@@ -123,7 +123,10 @@ def _update_changelogs(
 
     changelog_entry = ChangelogEntry(relevant_prs)
 
-    changelog_entry.write(GxFile.CHANGELOG_MD, last_version, release_version)
+    if git.trunk_is_0ver:
+        changelog_entry.write(GxFile.CHANGELOG_MD_V0, last_version, release_version)
+    else:
+        changelog_entry.write(GxFile.CHANGELOG_MD_V1, last_version, release_version)
     changelog_entry.write(GxFile.CHANGELOG_RST, last_version, release_version)
 
 

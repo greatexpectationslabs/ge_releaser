@@ -28,6 +28,13 @@ class GitService:
     def trunk(self) -> str:
         return self._trunk
 
+    @property
+    def trunk_is_0ver(self) -> bool:
+        """
+        Returns True if the trunk branch is named for a 0.x release.
+        """
+        return self._trunk.startswith("0.")
+
     def get_tags(self) -> List[git.Tag]:
         return sorted(self._git.tags, key=lambda t: t.commit.committed_datetime)
 

@@ -1,3 +1,4 @@
+import pathlib
 from typing import List, cast
 
 import click
@@ -26,13 +27,14 @@ def _parse_deployment_version_file() -> str:
 
 
 def _create_release(git: GitService, release_version: str, draft: bool) -> None:
-    release_notes = _gather_release_notes(release_version)
+    changelog_path = GxFile.CHANGELOG_MD_V0 if git.trunk_is_0ver else GxFile.CHANGELOG_MD_V1
+    release_notes = _gather_release_notes(release_version, pathlib.Path(changelog_path))
     message = "".join(line for line in release_notes)
     git.create_release(version=release_version, message=message, draft=draft)
 
 
-def _gather_release_notes(release_version: str) -> List[str]:
-    with open(GxFile.CHANGELOG_MD, "r") as f:
+def _gather_release_notes(release_version: str, changelog_path: pathlib.Path) -> List[str]:
+    with open(changelog_path, "r") as f:
         contents: List[str] = f.readlines()
 
     start: int = 0

@@ -22,7 +22,8 @@ class GxURL(str, enum.Enum):
 
 class GxFile(str, enum.Enum):
     DEPLOYMENT_VERSION = "great_expectations/deployment_version"
-    CHANGELOG_MD = "docs/docusaurus/docs/oss/changelog.md"
+    CHANGELOG_MD_V1 = "docs/docusaurus/docs/oss/changelog.md"
+    CHANGELOG_MD_V0 = "docs/docusaurus/docs/changelog.md"
     CHANGELOG_RST = "docs_rtd/changelog.rst"
     TEAMS = ".github/teams.yml"
     DOCS_DATA_COMPONENT = "docs/docusaurus/docs/components/_data.jsx"
@@ -30,7 +31,8 @@ class GxFile(str, enum.Enum):
 
 
 FILES_TO_COMMIT = (
-    GxFile.CHANGELOG_MD,
+    GxFile.CHANGELOG_MD_V1,
+    GxFile.CHANGELOG_MD_V0,
     GxFile.DOCS_DATA_COMPONENT,
     GxFile.DOCS_CONFIG,
     GxFile.CHANGELOG_RST,

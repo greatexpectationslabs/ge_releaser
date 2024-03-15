@@ -184,6 +184,8 @@ Specifically:
 If doing an pre-v1 bugfix you may need to change the trunk value to something other than `develop`.
 `ge_releaser` will check for an environment variable called `GE_RELEASE_TRUNK` and use this if it is set instead of `develop`.
 
+Example: `export GE_RELEASE_TRUNK=0.18.x`
+
 
 
 #### Yanking Releases
