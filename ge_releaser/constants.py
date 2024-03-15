@@ -13,7 +13,9 @@ GITHUB_REPO = "great-expectations/great_expectations"
 
 
 class GxURL(str, enum.Enum):
-    GITHUB_ACTIONS_BUILD = f"https://github.com/{GITHUB_REPO}/actions/workflows/ci.yml?query=event%3Apush"
+    GITHUB_ACTIONS_BUILD = (
+        f"https://github.com/{GITHUB_REPO}/actions/workflows/ci.yml?query=event%3Apush"
+    )
     PYPI_PAGE = "https://pypi.org/project/great-expectations/#history"
     BASE_URL = f"https://github.com/{GITHUB_REPO}"
     RELEASES = f"{BASE_URL}/releases"

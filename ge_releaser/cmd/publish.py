@@ -27,13 +27,17 @@ def _parse_deployment_version_file() -> str:
 
 
 def _create_release(git: GitService, release_version: str, draft: bool) -> None:
-    changelog_path = GxFile.CHANGELOG_MD_V0 if git.trunk_is_0ver else GxFile.CHANGELOG_MD_V1
+    changelog_path = (
+        GxFile.CHANGELOG_MD_V0 if git.trunk_is_0ver else GxFile.CHANGELOG_MD_V1
+    )
     release_notes = _gather_release_notes(release_version, pathlib.Path(changelog_path))
     message = "".join(line for line in release_notes)
     git.create_release(version=release_version, message=message, draft=draft)
 
 
-def _gather_release_notes(release_version: str, changelog_path: pathlib.Path) -> List[str]:
+def _gather_release_notes(
+    release_version: str, changelog_path: pathlib.Path
+) -> List[str]:
     with open(changelog_path, "r") as f:
         contents: List[str] = f.readlines()
 

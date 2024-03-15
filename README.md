@@ -1,3 +1,5 @@
+[![pre-commit.ci status](https://results.pre-commit.ci/badge/github/greatexpectationslabs/ge_releaser/main.svg)](https://results.pre-commit.ci/latest/github/greatexpectationslabs/ge_releaser/main)
+
 # ge_releaser
 
 A CLI tool built to streamline the process of cutting releases each week in the OSS repository.
@@ -49,7 +51,7 @@ The tool is designed to do pretty much EVERYTHING for you. Do not run isolated `
   - Install the tool using the above instructions.
   - Create a [personal access GitHub token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token), unless you already have one. Create a "classic" token, currently "Fine-grained tokens" are not supported. Give it `repo` permissions.
   - Authorize it for use with [SAML SSO](https://docs.github.com/en/enterprise-cloud@latest/authentication/authenticating-with-saml-single-sign-on/authorizing-a-personal-access-token-for-use-with-saml-single-sign-on), unless this has already been done previously.
-  - 
+  -
 
 ```
 export GITHUB_TOKEN=<token>
