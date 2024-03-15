@@ -1,3 +1,5 @@
+[![pre-commit.ci status](https://results.pre-commit.ci/badge/github/greatexpectationslabs/ge_releaser/main.svg)](https://results.pre-commit.ci/latest/github/greatexpectationslabs/ge_releaser/main)
+
 # ge_releaser
 
 A CLI tool built to streamline the process of cutting releases each week in the OSS repository.
