@@ -1,3 +1,4 @@
+# These hooks are run and applied automatically by pre-commit ci
 # For available hooks and configuration options see: https://pre-commit.com/hooks.html
 # To manage and run locally, first install `pre-commit` https://pre-commit.com/#installation
 # To auto update to the latest versions `pre-commit autoupdate`
