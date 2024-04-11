@@ -38,7 +38,7 @@ def tag_cmd(
 
 @cli.command(
     name="prep",
-    help="Prepare changelogs, release version, and Getting Started version in a PR",
+    help="Prepare changelog, release version, and Getting Started version in a PR",
 )
 @click.pass_obj
 def prep_cmd(git: GitService) -> None:

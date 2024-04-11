@@ -29,7 +29,7 @@ These commands are to be executed in Great Expectations development directory (b
 ```bash
 # Commands are meant to be run sequentially
 ge_releaser tag <git_hash> <semver>      # Tag the appropriate commit and trigger the build process
-ge_releaser prep                         # Modify changelogs and open a PR.
+ge_releaser prep                         # Modify changelog and open a PR.
 ge_releaser publish                      # Create a new GitHub release page
 ```
 
@@ -104,7 +104,7 @@ ge_releaser prep
 
 ![prep](./assets/prep.png)
 
-- This will generate changelogs, update relevant files, and draft a PR titled `[RELEASE] <RELEASE_NUMBER>`.
+- This will generate the changelog, update relevant files, and draft a PR titled `[RELEASE] <RELEASE_NUMBER>`.
 - Review the contents of this PR and ensure it looks appropriate before merging.
   - Check that the new changelog entry only contains changes that have transpired between the last release and this current one.
   - Additionally, ensure that any external contributors recieve attribution for their efforts.
@@ -164,7 +164,7 @@ Specifically:
   - Command: `git checkout -b release-X.Y.Z`
 - Update the version in `great_expectations/deployment_version`.
 - Update the version in `docs/tutorials/getting_started/tutorial_version_snippet.mdx`.
-- Add a new entry to `docs/changelog.md` and `docs_rtd/changelog.rst`.
+- Add a new entry to `docs/changelog.md`.
   - Ensure that lines are ordered by: `[BREAKING] | [FEATURE] | [BUGFIX] | [DOCS] | [MAINTENANCE]`
   - Ensure that each line has a reference to its corresponding PR.
   - If coming from an external contributor, make sure the line ends in `(thanks @<contributor_id>)`.

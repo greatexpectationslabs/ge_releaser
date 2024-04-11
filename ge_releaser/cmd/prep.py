@@ -37,7 +37,7 @@ def prep(git: GitService) -> None:
         last_version=last_version,
         release_version=release_version,
     )
-    click.secho(" * Updated changelogs (5/7)", fg="yellow")
+    click.secho(" * Updated changelog (5/7)", fg="yellow")
 
     git.stage_all_and_commit("release_prep")
     click.secho(" * Committed changes (6/7)", fg="yellow")
@@ -127,7 +127,6 @@ def _update_changelogs(
         changelog_entry.write(GxFile.CHANGELOG_MD_V0, last_version, release_version)
     else:
         changelog_entry.write(GxFile.CHANGELOG_MD_V1, last_version, release_version)
-    changelog_entry.write(GxFile.CHANGELOG_RST, last_version, release_version)
 
 
 def _collect_prs_since_last_release(
