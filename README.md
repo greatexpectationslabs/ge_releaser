@@ -69,7 +69,9 @@ export GE_RELEASE_TRUNK=0.18.x
 
 #### Collaborate
 
-Make sure to ask the team about any necessary PR's that might need to go in before running this command.
+- Make sure to ask the team about any necessary PR's that might need to go in before running this command.
+
+- Make sure to cordinate with #pod-zelda for the release of GX Agent. Releases of GX Agent will be on thursdays
 
 #### tag
 
