@@ -71,7 +71,7 @@ export GE_RELEASE_TRUNK=0.18.x
 
 - Make sure to ask the team about any necessary PR's that might need to go in before running this command.
 
-- Make sure to cordinate with #pod-zelda for the release of GX Agent. Releases of GX Agent will be on thursdays
+- Make sure to cordinate with #pod-zelda for the release of the GX Agent. Releases of the GX Agent will be on Thursdays.
 
 #### tag
 
@@ -89,7 +89,7 @@ ge_releaser tag --stable eb548b9b58bed229e601f2fe60c4767bcfca8c1d 0.18.8
 
 ![tag](./assets/tag.png)
 
-2. **IMPORTANT** - Wait until the [PyPi Deployment](https://github.com/great-expectations/great_expectations/deployments/pypi) finishes and version is published to the [PyPi page](https://pypi.org/project/great-expectations/#history)
+2. **IMPORTANT** - Wait until the [PyPi Deployment](https://github.com/great-expectations/great_expectations/deployments/pypi) finishes and version is published to the [PyPi page](https://pypi.org/project/great-expectations/#history). Now is a good time to start a thread in #gx-platform-release about the release. You can post updates to this thread as the release progresses.
 
 
 ```bash
