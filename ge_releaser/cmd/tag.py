@@ -50,7 +50,8 @@ def _tag_release_commit(git: GitService, commit: str, release_version: str) -> N
 def _print_next_steps(version_number: str) -> None:
     tag_url = os.path.join(GxURL.RELEASES, "tag", version_number)
 
-    msg = "Please wait for the build process and PyPI publishing to complete before moving to the `prep` cmd."
+    msg = ("Please start a thread in #gx-platform-release about the release and update the thread as the release progresses. "
+           "Make sure to wait for the build process and PyPI publishing to complete before moving to the `prep` cmd.")
 
     click.secho(f"\n{msg}", fg="green")
     click.echo(f"Link to tag: {tag_url}")
