@@ -49,7 +49,7 @@ def prep(git: GitService) -> None:
     )
     click.secho(" * Opened prep PR (7/7)", fg="yellow")
 
-    _print_next_steps(url)
+    _print_next_steps(url, git)
 
 
 def _parse_versions(
@@ -178,9 +178,13 @@ def _create_pr(
     return os.path.join(GxURL.PULL_REQUESTS, str(pr.number))
 
 
-def _print_next_steps(url: str) -> None:
+def _print_next_steps(url: str, git: GitService) -> None:
     click.secho(
         "\n[SUCCESS] Please review, approve, and merge PR before continuing to `publish` command",
         fg="green",
     )
     click.echo(f"Link to PR: {url}")
+    if git.trunk_is_0ver:
+        click.echo(
+            f"TEMPORARY MANUAL STEP: Please copy over the new changes from the above PR into {GxFile.CHANGELOG_MD_V1} on develop."
+        )
