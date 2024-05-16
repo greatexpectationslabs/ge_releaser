@@ -23,7 +23,10 @@ def check_if_in_gx_root() -> None:
     for constant in GxFile:
         if not os.path.exists(constant):
             nonexistent.append(constant)
-    if not (len(nonexistent) == 1 and nonexistent[0] in (GxFile.CHANGELOG_MD_V0, GxFile.CHANGELOG_MD_V1)):
+    if not (
+        len(nonexistent) == 1
+        and nonexistent[0] in (GxFile.CHANGELOG_MD_V0, GxFile.CHANGELOG_MD_V1)
+    ):
         raise ValueError(
             f"Could not find files '{nonexistent}'; are you sure you're in the root of the OSS repo?"
         )
