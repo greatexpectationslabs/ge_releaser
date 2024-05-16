@@ -5,7 +5,7 @@ import git
 import github
 from github.PullRequest import PullRequest
 
-from ge_releaser.constants import FILES_TO_COMMIT
+from ge_releaser.constants import GxFile
 
 
 class GitService:
@@ -59,7 +59,13 @@ class GitService:
             )
 
     def stage_all_and_commit(self, message: str) -> None:
-        self._git.git.add([file_class.value for file_class in FILES_TO_COMMIT])
+        files_to_commit = [
+            GxFile.CHANGELOG_MD_V0 if self.trunk_is_0ver else GxFile.CHANGELOG_MD_V1,
+            GxFile.DOCS_DATA_COMPONENT,
+            GxFile.DOCS_CONFIG,
+            GxFile.DEPLOYMENT_VERSION,
+        ]
+        self._git.git.add([file.value for file in files_to_commit])
         self._git.git.commit("-m", message, "--no-verify")
 
     def get_release_timestamp(self, version: str) -> dt.datetime:
