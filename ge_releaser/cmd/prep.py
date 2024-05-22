@@ -1,6 +1,6 @@
 import logging
 import os
-from typing import List, Tuple
+from typing import Final, List, Tuple
 
 import click
 from github.PullRequest import PullRequest
@@ -9,6 +9,8 @@ from packaging import version
 from ge_releaser.changelog import ChangelogEntry
 from ge_releaser.constants import GxFile, GxURL
 from ge_releaser.git import GitService
+
+LOGGER: Final[logging.Logger] = logging.getLogger(__name__)
 
 
 def prep(git: GitService) -> None:
@@ -55,12 +57,16 @@ def prep(git: GitService) -> None:
 def _parse_versions(
     git: GitService,
 ) -> Tuple[str, str]:
-    tags = git.get_tags()
-    release_version = version.parse(str(tags[-1]))
-    last_version = version.parse(str(tags[-2]))
+    tags_filter = "0." if git.trunk_is_0ver else "1."
+    tags_iterator = git.iter_recent_tags(prefix_filter=tags_filter, limit=2)
 
-    assert release_version > last_version, "Version provided to command is not valid"
+    release_version = version.parse(next(tags_iterator))
+    last_version = version.parse(next(tags_iterator))
 
+    LOGGER.info(f"{last_version=} {release_version=}")
+    assert (
+        release_version > last_version
+    ), f"Version provided to command is not valid, {release_version} <= {last_version}"
     return str(last_version), str(release_version)
 
 
@@ -153,7 +159,7 @@ def _collect_prs_since_last_release(
         if not pr.merged or "RELEASE" in pr.title:
             continue
 
-        logging.info(pr, pr.merged_at, counter)
+        LOGGER.info(pr, pr.merged_at, counter)
         if pr.merged_at < last_release:
             counter += 1
         if pr.merged_at > last_release:

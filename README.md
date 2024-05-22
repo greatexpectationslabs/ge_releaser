@@ -206,3 +206,8 @@ Example: `export GE_RELEASE_TRUNK=0.18.x`
     - Omit the `Reason` field and submit.
 
   3. Draft a community announcement, have the team review it in `#topic-great_expectations`, and send the reviewed message to the community Slack channel `#announcements`.
+
+
+#### Troubleshooting
+
+Optionally you can set a `GE_RELEASER_LOG_LEVEL` environment variable to enable more verbose logging.
