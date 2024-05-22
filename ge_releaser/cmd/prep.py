@@ -1,6 +1,6 @@
 import logging
 import os
-from typing import Final, Iterable, List, Tuple
+from typing import Final, List, Tuple
 
 import click
 from github.PullRequest import PullRequest

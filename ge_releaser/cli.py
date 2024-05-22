@@ -3,7 +3,6 @@ import os
 from typing import Final
 
 import click
-from typing_extensions import Literal
 
 from ge_releaser.cmd.prep import prep
 from ge_releaser.cmd.publish import publish
