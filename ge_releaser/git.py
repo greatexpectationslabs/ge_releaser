@@ -1,11 +1,14 @@
 import datetime as dt
-from typing import Iterable, List
+import logging
+from typing import Final, Generator, Iterable, List
 
 import git
 import github
 from github.PullRequest import PullRequest
 
 from ge_releaser.constants import GxFile
+
+LOGGER: Final[logging.Logger] = logging.getLogger(__name__)
 
 
 class GitService:
@@ -35,8 +38,31 @@ class GitService:
         """
         return self._trunk.startswith("0.")
 
-    def get_tags(self) -> List[git.Tag]:
-        return sorted(self._git.tags, key=lambda t: t.commit.committed_datetime)
+    def get_tags(self, reverse: bool = False) -> List[git.Tag]:
+        """See also `.iter_tags()`"""
+        return sorted(
+            self._git.tags, key=lambda t: t.commit.committed_datetime, reverse=reverse
+        )
+
+    def iter_recent_tags(
+        self, prefix_filter: str, limit: int = 2
+    ) -> Generator[str, None, None]:
+        """
+        Iterate over tags that start with a given prefix, up to a limit.
+        Useful for filtering out unrelated tags.
+        """
+        LOGGER.info(f"iter_tags: prefix_filter={prefix_filter}, limit={limit}")
+        if limit < 1:
+            raise ValueError("Limit must be greater than 0")
+        itered: int = 0
+        for tag in self.get_tags(reverse=True):
+            LOGGER.debug(f"tag: {tag.name}")
+            if itered >= limit:
+                return
+            if tag.name.startswith(prefix_filter):
+                LOGGER.info(f"yielding tag: {tag.name}")
+                yield tag.name
+                itered += 1
 
     def tag_commit(self, commit: str, version: str) -> None:
         self._git.git.checkout(commit)

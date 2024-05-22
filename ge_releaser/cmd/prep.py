@@ -1,6 +1,6 @@
 import logging
 import os
-from typing import Final, List, Tuple
+from typing import Final, Iterable, List, Tuple
 
 import click
 from github.PullRequest import PullRequest
@@ -57,13 +57,15 @@ def prep(git: GitService) -> None:
 def _parse_versions(
     git: GitService,
 ) -> Tuple[str, str]:
-    tags = git.get_tags()
-    release_version = version.parse(str(tags[-1]))
-    last_version = version.parse(str(tags[-2]))
+    tags_filter = "0." if git.trunk_is_0ver else "1."
+    tags_generator = git.iter_recent_tags(prefix_filter=tags_filter, limit=2)
+    release_version = version.parse(next(tags_generator))
+    last_version = version.parse(next(tags_generator))
 
     LOGGER.info(f"{last_version=} {release_version=}")
-    assert release_version > last_version, "Version provided to command is not valid"
-
+    assert (
+        release_version > last_version
+    ), f"Version provided to command is not valid, {release_version} <= {last_version}"
     return str(last_version), str(release_version)
 
 
