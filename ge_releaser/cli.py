@@ -11,7 +11,7 @@ from ge_releaser.cmd.tag import tag
 from ge_releaser.git import GitService
 from ge_releaser.utils import setup
 
-LOG_LEVEL_NAME: Final[str] = os.environ.get("GE_RELEASER_LOG_LEVEL", "WARNING")
+LOG_LEVEL_NAME: Final[str] = os.environ.get("GE_RELEASE_LOG_LEVEL", "WARNING")
 LOG_LEVEL: Final[int] = logging.getLevelName(LOG_LEVEL_NAME.upper())
 
 logging.basicConfig(level=LOG_LEVEL)
