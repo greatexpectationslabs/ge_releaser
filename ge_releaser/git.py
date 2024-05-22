@@ -39,7 +39,7 @@ class GitService:
         return self._trunk.startswith("0.")
 
     def get_tags(self, reverse: bool = False) -> List[git.Tag]:
-        """See also `.iter_tags()`"""
+        """See also `.iter_recent_tags()`"""
         return sorted(
             self._git.tags, key=lambda t: t.commit.committed_datetime, reverse=reverse
         )
