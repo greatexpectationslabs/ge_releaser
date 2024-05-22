@@ -58,9 +58,9 @@ def _parse_versions(
     git: GitService,
 ) -> Tuple[str, str]:
     tags_filter = "0." if git.trunk_is_0ver else "1."
-    tags_generator = git.iter_recent_tags(prefix_filter=tags_filter, limit=2)
-    release_version = version.parse(next(tags_generator))
-    last_version = version.parse(next(tags_generator))
+    tags_iterator = git.iter_recent_tags(prefix_filter=tags_filter, limit=2)
+    release_version = version.parse(next(tags_iterator))
+    last_version = version.parse(next(tags_iterator))
 
     LOGGER.info(f"{last_version=} {release_version=}")
     assert (
