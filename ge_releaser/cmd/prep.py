@@ -59,6 +59,7 @@ def _parse_versions(
 ) -> Tuple[str, str]:
     tags_filter = "0." if git.trunk_is_0ver else "1."
     tags_iterator = git.iter_recent_tags(prefix_filter=tags_filter, limit=2)
+    
     release_version = version.parse(next(tags_iterator))
     last_version = version.parse(next(tags_iterator))
 
