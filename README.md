@@ -28,7 +28,7 @@ These commands are to be executed in Great Expectations development directory (b
 
 ```bash
 # Commands are meant to be run sequentially
-ge_releaser tag <git_hash> <semver>      # Tag the appropriate commit and trigger the build process
+ge_releaser tag <git_hash> <semver>      # Tag the appropriate commit and trigger the build/deploy to pypi process
 ge_releaser prep                         # Modify changelog and open a PR.
 ge_releaser publish                      # Create a new GitHub release page
 ```
@@ -75,7 +75,9 @@ export GE_RELEASE_TRUNK=0.18.x
 
 #### tag
 
-1. Run the tag subcommand:
+1. `cd` into your great expectations repo
+
+2. Run the tag subcommand:
 
 ```
 ge_releaser tag --stable "<commit_hash>" "<release_version>"
@@ -89,7 +91,7 @@ ge_releaser tag --stable eb548b9b58bed229e601f2fe60c4767bcfca8c1d 0.18.8
 
 ![tag](./assets/tag.png)
 
-2. **IMPORTANT** - Wait until the [PyPi Deployment](https://github.com/great-expectations/great_expectations/deployments/pypi) finishes and version is published to the [PyPi page](https://pypi.org/project/great-expectations/#history). Now is a good time to start a thread in #gx-platform-release about the release. You can post updates to this thread as the release progresses.
+3. **IMPORTANT** - Wait until the [PyPi Deployment](https://github.com/great-expectations/great_expectations/deployments/pypi) finishes and version is published to the [PyPi page](https://pypi.org/project/great-expectations/#history). Now is a good time to start a thread in #gx-platform-release about the release. You can post updates to this thread as the release progresses.
 
 
 ```bash
@@ -128,7 +130,7 @@ ge_releaser publish
     - When you call out contributors, use there slack handle: @\<slack username\>
     - If no slack handle is present go to github and look at their user profile: https://github.com/<username> and then use "Real name (\<github username\>)":
     - If they have no real name, use their github handle: "\<github username\>"
-  - Send the reviewed message to the community Slack channel `#announcements`.
+  - Send the reviewed message to the community Slack channel `#gx-releases`.
   - Request emoji signal boosting from the team in private Slack channel `#topic-great_expectations`.
 
 ##### Formatting the Community Announcement Changelog
