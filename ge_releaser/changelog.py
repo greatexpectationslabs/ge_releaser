@@ -9,6 +9,7 @@ from ge_releaser.constants import GxFile, GxURL
 
 
 class ChangelogCategory(enum.Enum):
+    MINORBUMP = "MINORBUMP"
     FEATURE = "FEATURE"
     BUGFIX = "BUGFIX"
     DOCS = "DOCS"
