@@ -39,6 +39,22 @@ The tool is designed to do pretty much EVERYTHING for you. Do not run isolated `
 
 ---
 
+## Version Release Policy
+
+### Default Process
+
+1. Release at least once a week (Wednesdays)
+2. We bump the patch version
+3. A release message is posted in our public slack workspace in the channel #gx-releases
+
+Note for any given week we can skip the release. We are fine with doing ad hoc releases. One example of when we would do this is when we need to immediately release a feature for cloud.
+
+### Bumping Minor Version
+If the commits in this release contain a PR with the title tag `[MINORBUMP]` we bump the minor version instead of a patch version.
+
+We should follow semantic versioning when choosing to bump the minor version. In particular, when new functionality is made public this requires a minor version bump. New functionality is considered public when the `@public_api` decorator is added. We should hold off on adding this decorator until the end of an epic so we ship complete features. There will likely be a doc change that will accompany the feature release and you might want to hold off on adding the `@public_api` decorator until the docs pr is also ready to merge.
+
+
 ## Walkthrough
 
 `ge_releaser` acts as an abstraction on top of our standard manual release process. While the following steps should get you creating releases with ease, it is also important to understand what is happening under the hood. For each of the primary commands that `ge_releaser` offers, the individual manual steps taken by the machine are noted below. Although you shouldn't have to use them, it may be handy if debugging is required.
@@ -125,13 +141,28 @@ ge_releaser publish
 - This command will take the changelog notes generated from the previous step and write them to our GitHub Releases page.
 
 #### Community Announcement
-- Draft a message to the community and send it in the OSS Slack channel.
-  - To make sure the message is appropriate, draft an announcement and have the team review it in `#topic-great_expectations`.
-    - When you call out contributors, use there slack handle: @\<slack username\>
-    - If no slack handle is present go to github and look at their user profile: https://github.com/<username> and then use "Real name (\<github username\>)":
-    - If they have no real name, use their github handle: "\<github username\>"
-  - Send the reviewed message to the community Slack channel `#gx-releases`.
-  - Request emoji signal boosting from the team in private Slack channel `#topic-great_expectations`.
+Release message has the format:
+
+> :gx-blinking-logo-slow: :mega: :gx-blinking-logo-slow: We are pleased to announce the release of Great Expectations 1.<MINOR>.<PATCH>!  We’d like to give a special thanks to our contributors:
+> 
+> - \<contributor name\> for contributing \<contribution description\>
+> - \<contributor name\> for contributing \<contribution description\>
+> - …
+> 
+> Some of the highlights:
+> - \<release highlight\>
+> - \<release highlight\>
+> - …
+> 
+> The complete changelog is [here](link to release notes).
+
+\<contributor name\> is either a persons slack name (preferred) or their github handle.
+
+For examples please look in [#gx-releases](https://greatexpectationstalk.slack.com/archives/C050KHMU3M3).
+
+Note it’s ok for a highlights to be non-user facing:
+- Reworked internals to support an upcoming improved metrics interface
+- Added test coverage around X
 
 ##### Formatting the Community Announcement Changelog
 Entries in the changelog should appear as:
@@ -146,8 +177,6 @@ Specifically:
 - PRs should be written in the present tense
 - The PR numbers should appear in parenthesis and be linked to the PR
 - Contributors are credited with (thanks @username)
-
-
 
 ## Appendix
 
@@ -169,7 +198,7 @@ Specifically:
 - Update the version in `great_expectations/deployment_version`.
 - Update the version in `docs/tutorials/getting_started/tutorial_version_snippet.mdx`.
 - Add a new entry to `docs/changelog.md`.
-  - Ensure that lines are ordered by: `[BREAKING] | [FEATURE] | [BUGFIX] | [DOCS] | [MAINTENANCE]`
+  - Ensure that lines are ordered by: `[BREAKING] | [MINORBUMP] | [FEATURE] | [BUGFIX] | [DOCS] | [MAINTENANCE]`
   - Ensure that each line has a reference to its corresponding PR.
   - If coming from an external contributor, make sure the line ends in `(thanks @<contributor_id>)`.
   - Make sure we're only adding commits that have transpired between the last release and this current one.
