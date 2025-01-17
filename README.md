@@ -144,16 +144,16 @@ ge_releaser publish
 Release message has the format:
 
 > :gx-blinking-logo-slow: :mega: :gx-blinking-logo-slow: We are pleased to announce the release of Great Expectations 1.<MINOR>.<PATCH>!  We’d like to give a special thanks to our contributors:
-> 
+>
 > - \<contributor name\> for contributing \<contribution description\>
 > - \<contributor name\> for contributing \<contribution description\>
 > - …
-> 
+>
 > Some of the highlights:
 > - \<release highlight\>
 > - \<release highlight\>
 > - …
-> 
+>
 > The complete changelog is [here](link to release notes).
 
 \<contributor name\> is either a persons slack name (preferred) or their github handle.
