@@ -19,7 +19,7 @@ setuptools.setup(
     name="ge_releaser",
     version=get_version(),
     install_requires=get_requirements(),
-    python_requires=">=3.8",
+    python_requires=">=3.11",
     entry_points="""
       [console_scripts]
       ge_releaser=ge_releaser.cli:cli
