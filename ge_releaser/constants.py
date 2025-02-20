@@ -1,5 +1,5 @@
-import enum
 import pathlib
+from enum import StrEnum
 
 RELEASER_LOCAL_VERSION = str(
     pathlib.Path(__file__).parent.parent.joinpath("VERSION").resolve()
@@ -12,7 +12,7 @@ REMOTE = "origin"
 GITHUB_REPO = "great-expectations/great_expectations"
 
 
-class GxURL(str, enum.Enum):
+class GxURL(StrEnum):
     GITHUB_ACTIONS_BUILD = (
         f"https://github.com/{GITHUB_REPO}/actions/workflows/ci.yml?query=event%3Apush"
     )
@@ -22,7 +22,7 @@ class GxURL(str, enum.Enum):
     PULL_REQUESTS = f"{BASE_URL}/pull"
 
 
-class GxFile(str, enum.Enum):
+class GxFile(StrEnum):
     DEPLOYMENT_VERSION = "great_expectations/deployment_version"
     CHANGELOG_MD_V1 = "docs/docusaurus/docs/oss/changelog.md"
     CHANGELOG_MD_V0 = "docs/docusaurus/docs/changelog.md"
