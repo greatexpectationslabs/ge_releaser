@@ -8,7 +8,7 @@ A CLI tool built to streamline the process of cutting releases each week in the 
 
 ## Version release policy
 
-In general: 
+In general:
 
 - A new OSS version is released at least once a week (typically on Wednesdays)
 - We use semantic versioning: typically, the new version will get a patch bump, unless a major or minor version bump is [required](#bumping-minor-version).
@@ -26,7 +26,7 @@ To determine whether a minor version bump is required, check the commits that ha
 
 ## Installation
 
-To install the `ge_releaser` CLI tool, run the following commands: 
+To install the `ge_releaser` CLI tool, run the following commands:
 
 ```bash
 git clone git@github.com:greatexpectationslabs/ge_releaser.git
@@ -40,7 +40,7 @@ pip install -e .
 
 The `ge_releaser` acts as an abstraction on top of our standard manual release process. When releasing, carefully follow the detailed instructions [below](#how-to-release).
 
-At a high level, the following commands are used to release the latest version of the GX Core OSS version: 
+At a high level, the following commands are used to release the latest version of the GX Core OSS version:
 
 ```bash
 # Commands are meant to be run sequentially
@@ -52,7 +52,7 @@ ge_releaser publish                      # Create a new GitHub release page
 These commands are executed in the `great_expectations` directory from within the `ge_releaser` virtual environment. Unless resolving merge conflicts, **do NOT run isolated `git` commands**- this tool is designed to do (pretty much) everything for you.
 
 ---
-## How to release 
+## How to release
 
 While the following steps should get you creating releases with ease, it is also important to understand what is happening under the hood. For each of the primary commands that the `ge_releaser` offers, the individual manual steps taken by the machine are detailed below in the [Appendix](#manual-steps-behind-ge_releaser-commands). Although you shouldn't have to use them, they will be handy if debugging is required.
 
@@ -63,11 +63,11 @@ While the following steps should get you creating releases with ease, it is also
 
 Before proceeding with the `ge_releaser` commands:
 
-1. Install and setup the `ge_releaser` tool using the instructions [above](#installation). 
+1. Install and setup the `ge_releaser` tool using the instructions [above](#installation).
 
 1. Create and copy a new [personal access GitHub token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) for the release
-   - Create a `classic` token. `Fine-grained tokens` are not currently supported. 
-   - Give the token `repo` permissions. 
+   - Create a `classic` token. `Fine-grained tokens` are not currently supported.
+   - Give the token `repo` permissions.
    - Authorize the token for use with [SAML SSO](https://docs.github.com/en/enterprise-cloud@latest/authentication/authenticating-with-saml-single-sign-on/authorizing-a-personal-access-token-for-use-with-saml-single-sign-on). Be sure to copy the token before you take this step- you won't be able to see the token afterwords.
 
 ### tag
@@ -76,32 +76,32 @@ NOTE: Before running this command, ask the team about any unmerged PR's that mig
 
 1. Activate the `ge_releaser` virtual environment if it isn't already activated by running `. .venv/bin/activate` from within the `ge_releaser` directory.
 
-1. Navigate to the `great_expectations` repository. Verify that you're on the `develop` branch. 
+1. Navigate to the `great_expectations` repository. Verify that you're on the `develop` branch.
 
-1. Define the following environment variables: 
+1. Define the following environment variables:
 
       ```
      export GITHUB_TOKEN=<token>
       ```
-   (Optional) If the release isn't from the `develop` branch, select the release trunk: 
+   (Optional) If the release isn't from the `develop` branch, select the release trunk:
 
     ```
     export GE_RELEASE_TRUNK=0.18.x
     ```
-    More information on overriding the default trunk value can be found [here](#overriding-the-default-trunk-value). 
+    More information on overriding the default trunk value can be found [here](#overriding-the-default-trunk-value).
 
 1. Run the `tag` command:
 
     ```
     ge_releaser tag --stable "<commit_hash>" "<release_version>"
-    
+
     # Examples:
     ge_releaser tag --stable HEAD 0.18.8
     ge_releaser tag --stable eb548b9b58bed229e601f2fe60c4767bcfca8c1d 0.18.8
     ```
-    The command output should resemble: 
+    The command output should resemble:
     ![tag](./assets/tag.png)
-    
+
     The following error occurs if you do not have sufficient permissions to push a tag to the repository. You must be added to the open source core group which gives you maintainer permissions.
 
     ```
@@ -121,7 +121,7 @@ NOTE: Before running this command, ask the team about any unmerged PR's that mig
 
 ### prep
 
-1. Verify that there are no PR's set to automerge using the following command: 
+1. Verify that there are no PR's set to automerge using the following command:
     ```bash
     # Shell command to check if any PR's are set to automerge (requires jq)
     curl -s https://api.github.com/repos/great-expectations/great_expectations/pulls | jq '.[] | select(.auto_merge.merge_method == "squash") | {title: .title, author: .user.login, date: .created_at, link: .html_url}'
@@ -134,24 +134,24 @@ NOTE: Before running this command, ask the team about any unmerged PR's that mig
     ```
     ge_releaser prep
     ```
-    The command output should resemble: 
+    The command output should resemble:
     ![prep](./assets/prep.png)
 
 1. Review the contents of this PR and ensure it looks appropriate before merging.
    - Verify that the new changelog entry only contains changes that have transpired between the last release and this current one.
    - Ensure that any external contributors recieve attribution for their efforts.
-   - NOTE: If a release commit before `HEAD` was selected the changelog may include additional entries- these should be removed.  
+   - NOTE: If a release commit before `HEAD` was selected the changelog may include additional entries- these should be removed.
 
 ### publish
 
 1. Merge the release PR after it has been approved.
 
-1. Run the `publish` command to take the changelog notes generated from the `prep` step and write them to our GitHub Releases page: 
-    
+1. Run the `publish` command to take the changelog notes generated from the `prep` step and write them to our GitHub Releases page:
+
     ```
     ge_releaser publish
     ```
-   The command output should resemble: 
+   The command output should resemble:
 
     ![publish](./assets/publish.png)
 
@@ -174,9 +174,9 @@ The final step in the release process is crafting a message for our public Slack
 >
 > The complete changelog is [here](link to release notes).
 
-where `<contributor name>` is either a persons Slack (preferred) or GitHub handle. 
+where `<contributor name>` is either a persons Slack (preferred) or GitHub handle.
 
-Highlights do not all need to be user facing- things like added test coverage and reworked internals to support upcoming features are great things to highlight. 
+Highlights do not all need to be user facing- things like added test coverage and reworked internals to support upcoming features are great things to highlight.
 
 For examples, look in [#gx-platform-release](https://greatexpectationstalk.slack.com/archives/C050KHMU3M3).
 
@@ -205,13 +205,13 @@ For examples, look in [#gx-platform-release](https://greatexpectationstalk.slack
 1. Receive approval and merge the PR.
 
     #### Formatting the Community Announcement Changelog
-    
+
     Entries in the changelog should appear as:
-    
+
     > [FEATURE] Enable customization of candidate Regular Expression patterns when running OnboardingDataAssistant ([#7104](https://github.com/great-expectations/great_expectations/pull/7104))
-    
+
     Specifically:
-    
+
     - Capitalize the first letter of the subject after the [TAG]
     - Do not use punctuation as the first character of the subject after the [TAG]
     - Tags are one of the defined tags in our [contributor guide](https://docs.greatexpectations.io/docs/contributing/contributing_checklist/#1-create-a-pr)
@@ -255,4 +255,3 @@ In the case a release needs to be yanked, please take the following steps:
 ### Troubleshooting
 
 To enable more verbose logging, you can set the `GE_RELEASER_LOG_LEVEL` environment variable.
-
