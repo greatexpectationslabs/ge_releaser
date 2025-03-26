@@ -121,12 +121,6 @@ NOTE: Before running this command, ask the team about any unmerged PR's that mig
 
 ### prep
 
-1. Verify that there are no PR's set to automerge using the following command:
-    ```bash
-    # Shell command to check if any PR's are set to automerge (requires jq)
-    curl -s https://api.github.com/repos/great-expectations/great_expectations/pulls | jq '.[] | select(.auto_merge.merge_method == "squash") | {title: .title, author: .user.login, date: .created_at, link: .html_url}'
-    ```
-
 1. Verify that no untracked files or sensitive information (eg. credentials) will be committed and pushed to the repository.
 
 1. Run the `prep` command to generate the changelog, update relevant files, and draft a PR titled `[RELEASE] <RELEASE_NUMBER>`:
@@ -140,7 +134,8 @@ NOTE: Before running this command, ask the team about any unmerged PR's that mig
 1. Review the contents of this PR and ensure it looks appropriate before merging.
    - Verify that the new changelog entry only contains changes that have transpired between the last release and this current one.
    - Ensure that any external contributors recieve attribution for their efforts.
-   - NOTE: If a release commit before `HEAD` was selected the changelog may include additional entries- these should be removed.
+   - NOTE: If a release commit before `HEAD` was selected the changelog may include additional entries- these should be removed - they will be automatically included in the next relase changelog
+   - If any PRs were merged after the release tag, remove their entries from the changelog as they won't make it into this release and would otherwise be duplicated in the next release's changelog.
 
 ### publish
 
