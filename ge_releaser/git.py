@@ -101,7 +101,7 @@ class GitService:
             if e.status == 404:
                 # Check if this tag exists locally but not on GitHub
                 local_tag_exists = any(tag.name == version for tag in self.get_tags())
-                
+
                 if local_tag_exists:
                     # Tag exists locally but no release found - likely deleted on GitHub
                     raise ValueError(
