@@ -95,7 +95,28 @@ class GitService:
         self._git.git.commit("-m", message, "--no-verify")
 
     def get_release_timestamp(self, version: str) -> dt.datetime:
-        return self._gh.get_release(version).created_at
+        try:
+            return self._gh.get_release(version).created_at
+        except github.GithubException as e:
+            if e.status == 404:
+                # Check if this tag exists locally but not on GitHub
+                local_tag_exists = any(tag.name == version for tag in self.get_tags())
+
+                if local_tag_exists:
+                    # Tag exists locally but no release found - likely deleted on GitHub
+                    raise ValueError(
+                        f"Tag '{version}' exists in your local repository but no GitHub release was found.\n"
+                        f"This usually means the tag was deleted on GitHub but still exists locally.\n"
+                        f"To fix this, run: git fetch {self._remote} --prune --prune-tags\n"
+                        f"This will remove locally cached tags that no longer exist on GitHub."
+                    ) from e
+                else:
+                    # Tag doesn't exist locally either - different issue
+                    raise ValueError(
+                        f"No GitHub release found for tag '{version}'.\n"
+                        f"The tag may not exist, or the release may not have been created yet."
+                    ) from e
+            raise
 
     def get_merged_prs(self) -> Iterable[PullRequest]:
         return self._gh.get_pulls(
